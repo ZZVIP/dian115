@@ -1,8 +1,8 @@
 # DIAN115 Vue Federation UI v1
 
-每个插件必须提供一个签名的 Vue 3 Module Federation 页面。该页面在独立 opaque-origin iframe 中运行，使用宿主提供的 Vue 3、Naive UI 和 `@lucide/vue` singleton，并通过 `dian115-theme-v1` 变量跟随宿主主题。
+每个插件必须提供一个签名的 Vue 3 Module Federation 页面。该页面作为可信发布者代码在同源 iframe 中运行，使用宿主提供的 Vue 3、Naive UI 和 `@lucide/vue` singleton，并通过 `dian115-theme-v1` 变量跟随宿主主题。
 
-不存在声明式 UI、HTML 片段模式或加载失败回退协议。Federation 页面无法加载时，宿主显示错误，用户可以重试或管理插件。
+不存在其他 UI 格式、HTML 片段模式或加载失败回退协议。Federation 页面无法加载时，宿主显示错误，用户可以重试或管理插件。
 
 ## 1. Manifest 契约
 
@@ -91,7 +91,15 @@ export default defineConfig({
 
 `@originjs/vite-plugin-federation` 的生产端默认生成 ESM remote entry，不要添加只适用于消费端 remote 配置的顶层 `format`。三个 shared 必须使用 `singleton: true` 和 `generate: false`。示例中的局部 `as any` 只用于绕过当前 Federation 插件缺少 `singleton` 字段的 TypeScript 声明，不会改变生成配置。插件不能打包自己的第二份 Vue/Naive UI/Lucide。宿主返回的 Federation descriptor 会明确列出 `shared: ["vue", "naive-ui", "@lucide/vue"]`。
 
-不要从 CDN 动态加载框架、脚本、CSS、字体或图标。构建产物必须全部进入签名包。业务数据不得在浏览器直接请求第三方站点，应通过 action 进入 process，再由 `host.call` 请求。
+不要从 CDN 动态加载框架或可执行脚本；可执行构建产物必须全部进入签名包。页面可以渲染包内、HTTP、HTTPS、`data:` 和 `blob:` 图片，也可以发出普通浏览器请求。普通请求受 CORS、混合内容、Cookie 策略和页面生命周期约束；需要宿主代理、托管凭据、后台运行、审计或可靠重试时，应通过 action 进入 WASM runtime，再由 `host.call` 请求。
+
+### 大量封面与调用调度
+
+原生 `loading="lazy"` 只控制浏览器图片加载，不能限制插件提前发出的 action。使用 Broker 返回图片时，建议以实际滚动容器为 IntersectionObserver 的 root，在图片进入可视区域后排队；移出视口时取消尚未执行的任务并释放图片引用。滚动中暂停，停稳后仅补小批请求，例如每批 4 张、请求间隔 900 毫秒。保留单张重试和手动加载入口，避免无休止地重试坏图。
+
+单并发插件的封面、自动刷新和订阅应共用调用队列；用户操作优先于自动刷新和封面。取消前端等待不代表宿主已经取消执行，正在执行的调用必须等实际 Promise 完成才释放队列槽。组件卸载时关闭等待队列，避免继续向已离开的页面回传数据。不要反复拉取相同的完整 state 补丁。
+
+按图片来源合并请求，分别限制缓存条目数和字节数，并限制图片像素。优先向上游请求缩略图；可用 `Range` 减少传输，但不能假定上游一定遵守，完整性、截断标记和实际大小仍须检查。通过 action 返回 data URL 时，Base64 约增加三分之一体积；例如将二进制封面限制为 128 KiB，可为 256 KiB 的运行时业务 JSON 响应限额留下余量。Host Call 的 8 MiB 正文上限和 WASM 的 16 MiB 帧上限不是页面 action 的输出预算。
 
 ## 3. 组件 TypeScript 契约
 
@@ -190,30 +198,50 @@ const emit = defineEmits<{
 - `action`：当前同样只触发刷新，不携带 action 名；调用业务 action 必须使用 `api.invokeAction`；
 - `close`：离开当前插件页面。
 
-## 4. iframe 安全模型
+## 4. 同源可信 UI 模型
 
-页面加载在：
+宿主使用普通同源 iframe 加载插件页面，不添加 `sandbox` 属性，也不为插件页附加额外的 CSP sandbox。插件 UI 因而是完整的浏览器发布者代码，可以：
 
-```html
-<iframe sandbox="allow-scripts">
+- 使用 `localStorage`、`sessionStorage`、IndexedDB、Cache API 和同源 Cookie 的浏览器默认行为；
+- 使用 `fetch`、XHR、WebSocket、EventSource 和其他正常浏览器网络能力；
+- 渲染包内、HTTP、HTTPS、`data:` 和 `blob:` 图片；
+- 提交表单、使用剪贴板等浏览器 API，并在用户手势中打开 HTTP/HTTPS 弹窗；
+- 使用同源页面能够访问的 DOM 和浏览器状态。
+
+这不是 UI 权限隔离边界。管理员安装插件即表示信任签名发布者提供的 UI 和 process runtime。插件不得把宿主浏览器状态、Cookie 或其他敏感数据发送到未获得管理员信任的目标。宿主不会通过 bridge 主动下发 Bot Token、115 Cookie、TMDB key、代理凭据或 CD2 凭据，但同源页面仍应被视为高信任代码。
+
+普通浏览器网络能力不会替代 Host Call：跨域请求仍受 CORS，HTTPS 管理页加载 HTTP 资源仍受 mixed-content 规则，浏览器请求也没有宿主代理优先、托管凭据、后台生命周期、安装实例审计或重试语义。需要这些能力时必须通过 `api.invokeAction` 进入 process，再由 `host.call` 请求。
+
+组件与宿主仍通过带随机 channel 的 `postMessage` bridge 执行 `getState`、`invokeAction`、`refresh` 和 `close`。宿主只接受来自当前 iframe window、正确 source 标识和 channel 的消息。普通 bridge 调用 30 秒超时；`invokeAction` 根据 Manifest `runtime.timeout_ms` 计算等待时间，至少等待 30 秒，再加 10 秒传输余量。Manifest 前台超时合法范围为 100–120000 毫秒，因此有效清单的 bridge 等待上限为 130 秒。管理端 310 秒的传输保护上限不代表清单可以声明 300 秒的前台超时。超时不代表写操作已撤销，应根据业务 ID 或重新查询状态核对，避免重复提交。iframe 高度由 `ResizeObserver` 上报并限制在 320-100000 px。
+
+bridge 消息在发送前按 JSON 往返复制。props、action input、state 和 action result 必须可由 `JSON.stringify`/`JSON.parse` 无损传递；不要传函数、DOM 节点、循环引用、`BigInt`、`Symbol`、`Map`、`Set`、Vue ref/reactive proxy 或类实例。二进制数据使用 Base64 字符串，时间使用 ISO 8601 字符串。
+
+宿主建立 Naive UI provider 栈：`NConfigProvider`、`NMessageProvider`、`NNotificationProvider`、`NDialogProvider`。远程组件可正常使用 `useMessage`、`useNotification` 和 `useDialog`。
+
+### 4.1 用户手势弹窗契约
+
+需要异步生成地址时，插件必须在点击处理函数的第一步同步创建窗口，再等待 runtime action：
+
+```ts
+async function openOAuth() {
+  const popup = window.open('about:blank', '_blank', 'popup,width=1080,height=760')
+  if (!popup) return
+  try {
+    const response = await props.api.invokeAction('external-link', {})
+    const url = String(response.result?.url || '')
+    if (!/^https?:\/\//i.test(url)) throw new Error('invalid external URL')
+    popup.location.replace(url)
+  } catch (error) {
+    popup.close()
+  }
+}
 ```
 
-没有 `allow-same-origin`。因此页面：
-
-- 不能访问管理后台 DOM、Vue app、Pinia、router 或 Axios；
-- 不能读取宿主 Cookie、localStorage、sessionStorage 或 IndexedDB；
-- 不能直接请求带管理员身份的 DIAN115 API；
-- 不能依赖固定 iframe origin；
-- 不能导航父页面或弹出未授权窗口；
-- 只能通过带随机 channel token 的 `postMessage` bridge 执行 `getState`、`invokeAction`、`refresh`、`close`。
-
-宿主只接受来自当前 iframe window、正确 source 标识和随机 channel 的消息。bridge 每次调用 30 秒超时。iframe 高度由 sandbox 根据内容 ResizeObserver 自动上报，限制在 320-100000 px。
-
-宿主为 sandbox 建立 Naive UI provider 栈：`NConfigProvider`、`NMessageProvider`、`NNotificationProvider`、`NDialogProvider`。远程组件可正常使用 `useMessage`、`useNotification` 和 `useDialog`。
+只有用户点击、键盘操作等浏览器认可的手势通常能可靠打开弹窗。初始化、定时任务、Telegram 事件和后台 Promise 可能被浏览器拦截。弹窗地址可以是 HTTP 或 HTTPS；HTTPS 页面打开 HTTP 页面是否被限制由浏览器策略决定。
 
 ## 5. `dian115-theme-v1`
 
-宿主在 iframe 根元素声明所有 `--dian-*` 变量，并在主题切换时原地更新。插件不得覆盖 `:root` 或依赖 Naive UI 内部 `--n-*` 变量。可以在局部组件内派生自己的变量。
+宿主在 iframe 根元素声明所有 `--dian-*` 变量，并在主题切换时原地更新。插件不要覆盖宿主提供的 `:root --dian-*` 值，也不要依赖 Naive UI 内部 `--n-*` 变量；可以在局部组件内派生自己的变量。
 
 ### 5.1 模式、背景和表面
 
@@ -277,10 +305,12 @@ const emit = defineEmits<{
 
 ## 6. 基础样式
 
-sandbox 已提供两个稳定 class：
+插件页面已提供两个稳定 class：
 
 ```css
 .dian-plugin-page {
+  width: 100%;
+  max-width: 100%;
   min-width: 0;
   color: var(--dian-text-primary);
   font-family: var(--dian-font-family);
@@ -295,6 +325,10 @@ sandbox 已提供两个稳定 class：
 ```
 
 推荐页面根节点使用 `dian-plugin-page`。不要在卡片内再嵌套装饰卡片；用 full-width section、grid、tabs、data table、list 或 form 组织工作流。
+
+宿主会先为 iframe 提供统一的页面基线：`html`、`body` 和 `#plugin-sandbox-root` 的宽度为可用视口宽度，默认外边距为 `0`，后代元素使用 `border-box`，页面背景和字体来自主题变量。插件页面不要在 `body` 上设置固定 `max-width`、固定最小宽度或依赖预览页的默认外边距；应让 `.dian-plugin-page` 使用 `width: 100%; max-width: 100%; min-width: 0`，由自己的 grid、表格容器或局部滚动区域处理内容溢出。
+
+正式 Federation 页面不会自动加载插件本地预览入口的全局 CSS。预览入口应只用于模拟 bridge 和本地调试，正式页面所需的全局页面样式（包括 `html/body` 基线）应写入远程组件自己的样式，或直接依赖上述宿主基线。桌面浏览器不一定代表宽视口：侧边导航会减少插件 iframe 的实际宽度，双栏布局建议在 `900-1000px` 范围内切换为单栏，并让工具栏允许换行。
 
 响应式布局示例：
 

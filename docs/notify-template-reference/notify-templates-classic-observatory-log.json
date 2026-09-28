@@ -1,0 +1,548 @@
+{
+  "format": "dian115-notify-template-package",
+  "version": 2,
+  "exported_at": "2026-09-27T10:00:00+08:00",
+  "templates": [
+    {
+      "key": "playback_start",
+      "name": "开始播放",
+      "parent_type": "playback",
+      "template": {
+        "title": "🔭 天文观测日志·开播",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}观测日志 · 目标：开播{{ tg_italic_end }}\n· ° ˚ · ° ˚ ·\n{{ tg_bold_start }}◈ 观测数据{{ tg_bold_end }}\n{% if title_year %}∙ 标题 ＝ {{ title_year }}{% endif %}\n{% if season_episode %}∙ 季集 ＝ {{ season_episode }}{% endif %}\n{% if media_type %}∙ 媒体类型 ＝ {{ media_type }}{% endif %}\n{% if user_name %}∙ 观测员 ＝ {{ user_name }}{% endif %}\n{% if client %}∙ 客户端 ＝ {{ client }}{% endif %}\n{% if device_name %}∙ 望远镜 ＝ {{ device_name }}{% endif %}\n{% if emby_instance_name %}∙ 实例 ＝ {{ emby_instance_name }}{% endif %}\n{% if position_time %}∙ 播放位置 ＝ {{ position_time }}{% endif %}\n{% if runtime_time %}∙ 总时长 ＝ {{ runtime_time }}{% endif %}\n{% if quality %}∙ 视宁度 ＝ {{ quality }}{% endif %}\n{% if rating %}∙ 星等 ＝ {{ rating }}{% endif %}\n{{ tg_expandable_quote_start }}附属观测记录（点开）\n{% if quality_comment %}∙ 画质点评 ＝ {{ quality_comment }}{% endif %}\n{% if genres %}∙ 光谱型 ＝ {{ genres }}{% endif %}\n{% if actors %}∙ 演员 ＝ {{ actors }}{% endif %}\n{% if directors %}∙ 导演 ＝ {{ directors }}{% endif %}\n{% if overview %}∙ 目标概要 ＝ {{ overview }}{% endif %}\n{% if ip %}∙ IP 地址 ＝ {{ ip }}{% endif %}\n{% if tmdb_link %}∙ TMDB ＝ {{ tmdb_link }}{% endif %}\n{% if imdb_link %}∙ IMDb ＝ {{ imdb_link }}{% endif %}{{ tg_expandable_quote_end }}\n· ° ˚ · ° ˚ ·\n∙ 观测时刻 ＝ {{ now }}\n{{ tg_italic_start }}今夜观测结束，数据已归档。{{ tg_italic_end }}",
+        "quality_comments": {
+          "customized": true,
+          "dolby_vision": "Dolby Vision：暗弱星云的细节被完整留住。",
+          "hdr": "HDR：星点与尘埃的层次清晰。",
+          "4k": "4K：解析力足以分辨旋臂。",
+          "1080p": "1080P：视场干净。"
+        }
+      }
+    },
+    {
+      "key": "playback_stop",
+      "name": "停止播放",
+      "parent_type": "playback",
+      "template": {
+        "title": "🔭 天文观测日志·停播",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}观测日志 · 目标：停播{{ tg_italic_end }}\n· ° ˚ · ° ˚ ·\n{{ tg_bold_start }}◈ 观测数据{{ tg_bold_end }}\n{% if title_year %}∙ 标题 ＝ {{ title_year }}{% endif %}\n{% if season_episode %}∙ 季集 ＝ {{ season_episode }}{% endif %}\n{% if media_type %}∙ 媒体类型 ＝ {{ media_type }}{% endif %}\n{% if percentage %}∙ 播放进度 ＝ {{ percentage }}%{% endif %}\n{% if user_name %}∙ 观测员 ＝ {{ user_name }}{% endif %}\n{% if device_name %}∙ 望远镜 ＝ {{ device_name }}{% endif %}\n{% if client %}∙ 客户端 ＝ {{ client }}{% endif %}\n{% if emby_instance_name %}∙ 实例 ＝ {{ emby_instance_name }}{% endif %}\n{% if position_time %}∙ 播放位置 ＝ {{ position_time }}{% endif %}\n{% if runtime_time %}∙ 总时长 ＝ {{ runtime_time }}{% endif %}\n{% if remaining_time %}∙ 剩余时间 ＝ {{ remaining_time }}{% endif %}\n{% if quality %}∙ 视宁度 ＝ {{ quality }}{% endif %}\n{{ tg_expandable_quote_start }}附属观测记录（点开）\n{% if quality_comment %}∙ 画质点评 ＝ {{ quality_comment }}{% endif %}\n{% if genres %}∙ 光谱型 ＝ {{ genres }}{% endif %}\n{% if actors %}∙ 演员 ＝ {{ actors }}{% endif %}\n{% if directors %}∙ 导演 ＝ {{ directors }}{% endif %}\n{% if overview %}∙ 目标概要 ＝ {{ overview }}{% endif %}\n{% if ip %}∙ IP 地址 ＝ {{ ip }}{% endif %}\n{% if tmdb_link %}∙ TMDB ＝ {{ tmdb_link }}{% endif %}\n{% if imdb_link %}∙ IMDb ＝ {{ imdb_link }}{% endif %}{{ tg_expandable_quote_end }}\n· ° ˚ · ° ˚ ·\n∙ 观测时刻 ＝ {{ now }}\n{{ tg_italic_start }}今夜观测结束，数据已归档。{{ tg_italic_end }}",
+        "quality_comments": {
+          "customized": true,
+          "dolby_vision": "Dolby Vision：暗弱星云的细节被完整留住。",
+          "hdr": "HDR：星点与尘埃的层次清晰。",
+          "4k": "4K：解析力足以分辨旋臂。",
+          "1080p": "1080P：视场干净。"
+        }
+      }
+    },
+    {
+      "key": "media_library_add",
+      "name": "资源入库",
+      "parent_type": "media_library",
+      "template": {
+        "title": "🔭 天文观测日志·入库",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}观测日志 · 目标：入库{{ tg_italic_end }}\n· ° ˚ · ° ˚ ·\n{{ tg_bold_start }}◈ 观测数据{{ tg_bold_end }}\n{% if title_year %}∙ 标题 ＝ {{ title_year }}{% endif %}\n{% if season_episode %}∙ 季集 ＝ {{ season_episode }}{% endif %}\n{% if media_type %}∙ 媒体类型 ＝ {{ media_type }}{% endif %}\n{% if library_name %}∙ 星表 ＝ {{ library_name }}{% endif %}\n{% if file_count %}∙ 帧数 ＝ {{ file_count }}{% endif %}\n{% if episode_count %}∙ 集数 ＝ {{ episode_count }}{% endif %}\n{% if total_size %}∙ 总大小 ＝ {{ total_size }}{% endif %}\n{% if quality %}∙ 视宁度 ＝ {{ quality }}{% endif %}\n{% if status %}∙ 状态 ＝ {{ status }}{% endif %}\n{% if emby_instance_name %}∙ 实例 ＝ {{ emby_instance_name }}{% endif %}\n{{ tg_expandable_quote_start }}附属观测记录（点开）\n{% if quality_comment %}∙ 画质点评 ＝ {{ quality_comment }}{% endif %}\n{% if genres %}∙ 光谱型 ＝ {{ genres }}{% endif %}\n{% if actors %}∙ 演员 ＝ {{ actors }}{% endif %}\n{% if directors %}∙ 导演 ＝ {{ directors }}{% endif %}\n{% if overview %}∙ 目标概要 ＝ {{ overview }}{% endif %}\n{% if tmdb_link %}∙ TMDB ＝ {{ tmdb_link }}{% endif %}\n{% if imdb_link %}∙ IMDb ＝ {{ imdb_link }}{% endif %}{{ tg_expandable_quote_end }}\n· ° ˚ · ° ˚ ·\n∙ 观测时刻 ＝ {{ time_range or now }}\n{{ tg_italic_start }}今夜观测结束，数据已归档。{{ tg_italic_end }}",
+        "quality_comments": {
+          "customized": true,
+          "dolby_vision": "Dolby Vision：暗弱星云的细节被完整留住。",
+          "hdr": "HDR：星点与尘埃的层次清晰。",
+          "4k": "4K：解析力足以分辨旋臂。",
+          "1080p": "1080P：视场干净。"
+        }
+      }
+    },
+    {
+      "key": "media_library_update",
+      "name": "媒体更新",
+      "parent_type": "media_library",
+      "template": {
+        "title": "🔭 天文观测日志·更新",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}观测日志 · 目标：更新{{ tg_italic_end }}\n· ° ˚ · ° ˚ ·\n{{ tg_bold_start }}◈ 观测数据{{ tg_bold_end }}\n{% if title_year %}∙ 标题 ＝ {{ title_year }}{% endif %}\n{% if season_episode %}∙ 季集 ＝ {{ season_episode }}{% endif %}\n{% if media_type %}∙ 媒体类型 ＝ {{ media_type }}{% endif %}\n{% if library_name %}∙ 星表 ＝ {{ library_name }}{% endif %}\n{% if file_count %}∙ 帧数 ＝ {{ file_count }}{% endif %}\n{% if total_size %}∙ 总大小 ＝ {{ total_size }}{% endif %}\n{% if quality %}∙ 视宁度 ＝ {{ quality }}{% endif %}\n{% if event_action %}∙ 事件动作 ＝ {{ event_action }}{% endif %}\n{% if status %}∙ 状态 ＝ {{ status }}{% endif %}\n{% if emby_instance_name %}∙ 实例 ＝ {{ emby_instance_name }}{% endif %}\n{% if item_id %}∙ 项目 ID ＝ {{ item_id }}{% endif %}\n{{ tg_expandable_quote_start }}附属观测记录（点开）\n{% if quality_comment %}∙ 画质点评 ＝ {{ quality_comment }}{% endif %}\n{% if genres %}∙ 光谱型 ＝ {{ genres }}{% endif %}\n{% if actors %}∙ 演员 ＝ {{ actors }}{% endif %}\n{% if directors %}∙ 导演 ＝ {{ directors }}{% endif %}\n{% if overview %}∙ 目标概要 ＝ {{ overview }}{% endif %}\n{% if tmdb_link %}∙ TMDB ＝ {{ tmdb_link }}{% endif %}\n{% if imdb_link %}∙ IMDb ＝ {{ imdb_link }}{% endif %}{{ tg_expandable_quote_end }}\n· ° ˚ · ° ˚ ·\n∙ 观测时刻 ＝ {{ time_range or now }}\n{{ tg_italic_start }}今夜观测结束，数据已归档。{{ tg_italic_end }}",
+        "quality_comments": {
+          "customized": true,
+          "dolby_vision": "Dolby Vision：暗弱星云的细节被完整留住。",
+          "hdr": "HDR：星点与尘埃的层次清晰。",
+          "4k": "4K：解析力足以分辨旋臂。",
+          "1080p": "1080P：视场干净。"
+        }
+      }
+    },
+    {
+      "key": "emby_user_authenticated",
+      "name": "用户登录成功",
+      "parent_type": "emby_security",
+      "template": {
+        "title": "🔭 天文观测日志·登录",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}观测日志 · 目标：登录{{ tg_italic_end }}\n· ° ˚ · ° ˚ ·\n{{ tg_bold_start }}◈ 观测数据{{ tg_bold_end }}\n{% if user_name %}∙ 观测员 ＝ {{ user_name }}{% endif %}\n{% if device_name %}∙ 望远镜 ＝ {{ device_name }}{% endif %}\n{% if severity %}∙ 级别 ＝ {{ severity }}{% endif %}\n{% if description %}∙ 描述 ＝ {{ description }}{% endif %}\n∙ 实例 ＝ {{ emby_instance_name or server_name }}\n{{ tg_expandable_quote_start }}附属观测记录（点开）\n{% if url %}∙ 链接 ＝ {{ url }}{% endif %}{{ tg_expandable_quote_end }}\n· ° ˚ · ° ˚ ·\n∙ 观测时刻 ＝ {{ now }}\n{{ tg_italic_start }}今夜观测结束，数据已归档。{{ tg_italic_end }}"
+      }
+    },
+    {
+      "key": "emby_user_authentication_failed",
+      "name": "用户登录失败",
+      "parent_type": "emby_security",
+      "template": {
+        "title": "🔭 天文观测日志·登录失败",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}观测日志 · 目标：登录失败{{ tg_italic_end }}\n· ° ˚ · ° ˚ ·\n{{ tg_bold_start }}◈ 观测数据{{ tg_bold_end }}\n{% if user_name %}∙ 观测员 ＝ {{ user_name }}{% endif %}\n{% if device_name %}∙ 望远镜 ＝ {{ device_name }}{% endif %}\n{% if severity %}∙ 级别 ＝ {{ severity }}{% endif %}\n{% if description %}∙ 描述 ＝ {{ description }}{% endif %}\n∙ 实例 ＝ {{ emby_instance_name or server_name }}\n{{ tg_expandable_quote_start }}附属观测记录（点开）\n{% if url %}∙ 链接 ＝ {{ url }}{% endif %}{{ tg_expandable_quote_end }}\n· ° ˚ · ° ˚ ·\n∙ 观测时刻 ＝ {{ now }}\n{{ tg_italic_start }}今夜观测结束，数据已归档。{{ tg_italic_end }}"
+      }
+    },
+    {
+      "key": "emby_user_locked_out",
+      "name": "用户被锁定",
+      "parent_type": "emby_security",
+      "template": {
+        "title": "🔭 天文观测日志·锁定",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}观测日志 · 目标：锁定{{ tg_italic_end }}\n· ° ˚ · ° ˚ ·\n{{ tg_bold_start }}◈ 观测数据{{ tg_bold_end }}\n{% if user_name %}∙ 观测员 ＝ {{ user_name }}{% endif %}\n{% if severity %}∙ 级别 ＝ {{ severity }}{% endif %}\n{% if description %}∙ 描述 ＝ {{ description }}{% endif %}\n∙ 实例 ＝ {{ emby_instance_name or server_name }}\n{{ tg_expandable_quote_start }}附属观测记录（点开）\n{% if url %}∙ 链接 ＝ {{ url }}{% endif %}{{ tg_expandable_quote_end }}\n· ° ˚ · ° ˚ ·\n∙ 观测时刻 ＝ {{ now }}\n{{ tg_italic_start }}今夜观测结束，数据已归档。{{ tg_italic_end }}"
+      }
+    },
+    {
+      "key": "emby_user_created",
+      "name": "用户已创建",
+      "parent_type": "emby_security",
+      "template": {
+        "title": "🔭 天文观测日志·新建用户",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}观测日志 · 目标：新建用户{{ tg_italic_end }}\n· ° ˚ · ° ˚ ·\n{{ tg_bold_start }}◈ 观测数据{{ tg_bold_end }}\n{% if user_name %}∙ 观测员 ＝ {{ user_name }}{% endif %}\n{% if device_name %}∙ 望远镜 ＝ {{ device_name }}{% endif %}\n{% if severity %}∙ 级别 ＝ {{ severity }}{% endif %}\n{% if description %}∙ 描述 ＝ {{ description }}{% endif %}\n∙ 实例 ＝ {{ emby_instance_name or server_name }}\n{{ tg_expandable_quote_start }}附属观测记录（点开）\n{% if url %}∙ 链接 ＝ {{ url }}{% endif %}{{ tg_expandable_quote_end }}\n· ° ˚ · ° ˚ ·\n∙ 观测时刻 ＝ {{ now }}\n{{ tg_italic_start }}今夜观测结束，数据已归档。{{ tg_italic_end }}"
+      }
+    },
+    {
+      "key": "emby_user_deleted",
+      "name": "用户已删除",
+      "parent_type": "emby_security",
+      "template": {
+        "title": "🔭 天文观测日志·删除用户",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}观测日志 · 目标：删除用户{{ tg_italic_end }}\n· ° ˚ · ° ˚ ·\n{{ tg_bold_start }}◈ 观测数据{{ tg_bold_end }}\n{% if user_name %}∙ 观测员 ＝ {{ user_name }}{% endif %}\n{% if severity %}∙ 级别 ＝ {{ severity }}{% endif %}\n{% if description %}∙ 描述 ＝ {{ description }}{% endif %}\n∙ 实例 ＝ {{ emby_instance_name or server_name }}\n{{ tg_expandable_quote_start }}附属观测记录（点开）\n{% if url %}∙ 链接 ＝ {{ url }}{% endif %}{{ tg_expandable_quote_end }}\n· ° ˚ · ° ˚ ·\n∙ 观测时刻 ＝ {{ now }}\n{{ tg_italic_start }}今夜观测结束，数据已归档。{{ tg_italic_end }}"
+      }
+    },
+    {
+      "key": "emby_user_password_changed",
+      "name": "用户密码更改",
+      "parent_type": "emby_security",
+      "template": {
+        "title": "🔭 天文观测日志·改密",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}观测日志 · 目标：改密{{ tg_italic_end }}\n· ° ˚ · ° ˚ ·\n{{ tg_bold_start }}◈ 观测数据{{ tg_bold_end }}\n{% if user_name %}∙ 观测员 ＝ {{ user_name }}{% endif %}\n{% if device_name %}∙ 望远镜 ＝ {{ device_name }}{% endif %}\n{% if severity %}∙ 级别 ＝ {{ severity }}{% endif %}\n{% if description %}∙ 描述 ＝ {{ description }}{% endif %}\n∙ 实例 ＝ {{ emby_instance_name or server_name }}\n{{ tg_expandable_quote_start }}附属观测记录（点开）\n{% if url %}∙ 链接 ＝ {{ url }}{% endif %}{{ tg_expandable_quote_end }}\n· ° ˚ · ° ˚ ·\n∙ 观测时刻 ＝ {{ now }}\n{{ tg_italic_start }}今夜观测结束，数据已归档。{{ tg_italic_end }}"
+      }
+    },
+    {
+      "key": "emby_user_policy_updated",
+      "name": "用户策略更新",
+      "parent_type": "emby_security",
+      "template": {
+        "title": "🔭 天文观测日志·策略",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}观测日志 · 目标：策略{{ tg_italic_end }}\n· ° ˚ · ° ˚ ·\n{{ tg_bold_start }}◈ 观测数据{{ tg_bold_end }}\n{% if user_name %}∙ 观测员 ＝ {{ user_name }}{% endif %}\n{% if severity %}∙ 级别 ＝ {{ severity }}{% endif %}\n{% if description %}∙ 描述 ＝ {{ description }}{% endif %}\n∙ 实例 ＝ {{ emby_instance_name or server_name }}\n{{ tg_expandable_quote_start }}附属观测记录（点开）\n{% if url %}∙ 链接 ＝ {{ url }}{% endif %}{{ tg_expandable_quote_end }}\n· ° ˚ · ° ˚ ·\n∙ 观测时刻 ＝ {{ now }}\n{{ tg_italic_start }}今夜观测结束，数据已归档。{{ tg_italic_end }}"
+      }
+    },
+    {
+      "key": "library_organize_success",
+      "name": "整理完成",
+      "parent_type": "library_organize",
+      "template": {
+        "title": "🔭 天文观测日志·整理完成",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}观测日志 · 目标：整理完成{{ tg_italic_end }}\n· ° ˚ · ° ˚ ·\n{{ tg_bold_start }}◈ 观测数据{{ tg_bold_end }}\n{% if title_year %}∙ 标题 ＝ {{ title_year }}{% endif %}\n{% if season_episode %}∙ 季集 ＝ {{ season_episode }}{% endif %}\n{% if media_type %}∙ 媒体类型 ＝ {{ media_type }}{% endif %}\n{% if action_text %}∙ 动作 ＝ {{ action_text }}{% endif %}\n{% if file_count %}∙ 帧数 ＝ {{ file_count }}{% endif %}\n{% if episode_count %}∙ 集数 ＝ {{ episode_count }}{% endif %}\n{% if total_size %}∙ 总大小 ＝ {{ total_size }}{% endif %}\n{% if quality %}∙ 视宁度 ＝ {{ quality }}{% endif %}\n{% if year %}∙ 年份 ＝ {{ year }}{% endif %}\n{% if rating %}∙ 星等 ＝ {{ rating }}{% endif %}\n{% if is_wash %}∙ 洗版 ＝ {{ wash_status or '洗版完成' }}{% if wash_reason %} · {{ wash_reason }}{% endif %}{% endif %}\n{% if genres %}∙ 光谱型 ＝ {{ genres }}{% endif %}\n{{ tg_expandable_quote_start }}附属观测记录（点开）\n{% if quality_comment %}∙ 画质点评 ＝ {{ quality_comment }}{% endif %}\n{% if overview %}∙ 目标概要 ＝ {{ overview }}{% endif %}\n{% if source_path %}∙ 方位 ＝ {{ source_path }}{% endif %}\n{% if target_path %}∙ 落点 ＝ {{ target_path }}{% endif %}\n{% if tmdb_link %}∙ TMDB ＝ {{ tmdb_link }}{% endif %}\n{% if imdb_link %}∙ IMDb ＝ {{ imdb_link }}{% endif %}{{ tg_expandable_quote_end }}\n· ° ˚ · ° ˚ ·\n∙ 观测时刻 ＝ {{ time_range or now }}\n{{ tg_italic_start }}今夜观测结束，数据已归档。{{ tg_italic_end }}",
+        "quality_comments": {
+          "customized": true,
+          "dolby_vision": "Dolby Vision：暗弱星云的细节被完整留住。",
+          "hdr": "HDR：星点与尘埃的层次清晰。",
+          "4k": "4K：解析力足以分辨旋臂。",
+          "1080p": "1080P：视场干净。"
+        }
+      }
+    },
+    {
+      "key": "library_organize_skip",
+      "name": "整理跳过",
+      "parent_type": "library_organize",
+      "template": {
+        "title": "🔭 天文观测日志·整理跳过",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}观测日志 · 目标：整理跳过{{ tg_italic_end }}\n· ° ˚ · ° ˚ ·\n{{ tg_bold_start }}◈ 观测数据{{ tg_bold_end }}\n{% if title_year %}∙ 标题 ＝ {{ title_year }}{% endif %}\n{% if season_episode %}∙ 季集 ＝ {{ season_episode }}{% endif %}\n{% if media_type %}∙ 媒体类型 ＝ {{ media_type }}{% endif %}\n{% if skip_reason %}∙ 原因 ＝ {{ skip_reason }}{% endif %}\n{% if wash_reason %}∙ 原因 ＝ {{ wash_reason }}{% endif %}\n{% if source_path %}∙ 方位 ＝ {{ source_path }}{% endif %}\n{% if quality %}∙ 视宁度 ＝ {{ quality }}{% endif %}\n{% if rating %}∙ 星等 ＝ {{ rating }}{% endif %}\n{{ tg_expandable_quote_start }}附属观测记录（点开）\n{% if quality_comment %}∙ 画质点评 ＝ {{ quality_comment }}{% endif %}\n{% if genres %}∙ 光谱型 ＝ {{ genres }}{% endif %}\n{% if overview %}∙ 目标概要 ＝ {{ overview }}{% endif %}\n{% if target_path %}∙ 落点 ＝ {{ target_path }}{% endif %}\n{% if tmdb_link %}∙ TMDB ＝ {{ tmdb_link }}{% endif %}\n{% if imdb_link %}∙ IMDb ＝ {{ imdb_link }}{% endif %}{{ tg_expandable_quote_end }}\n· ° ˚ · ° ˚ ·\n∙ 观测时刻 ＝ {{ time_range or now }}\n{{ tg_italic_start }}今夜观测结束，数据已归档。{{ tg_italic_end }}",
+        "quality_comments": {
+          "customized": true,
+          "dolby_vision": "Dolby Vision：暗弱星云的细节被完整留住。",
+          "hdr": "HDR：星点与尘埃的层次清晰。",
+          "4k": "4K：解析力足以分辨旋臂。",
+          "1080p": "1080P：视场干净。"
+        }
+      }
+    },
+    {
+      "key": "library_organize_fail",
+      "name": "整理失败",
+      "parent_type": "library_organize",
+      "template": {
+        "title": "🔭 天文观测日志·整理失败",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}观测日志 · 目标：整理失败{{ tg_italic_end }}\n· ° ˚ · ° ˚ ·\n{{ tg_bold_start }}◈ 观测数据{{ tg_bold_end }}\n{% if failure_count %}∙ 问题 ＝ {{ failure_count }}{% endif %}\n{% if action_text %}∙ 动作 ＝ {{ action_text }}{% endif %}\n{% if title %}∙ 标题 ＝ {{ title }}{% endif %}\n{% if source_path %}∙ 方位 ＝ {{ source_path }}{% endif %}\n{% if target_path %}∙ 落点 ＝ {{ target_path }}{% endif %}\n{% if error_message %}∙ 错误 ＝ {{ error_message }}{% endif %}\n{{ tg_bold_start }}失败明细{{ tg_bold_end }}\n{% for item in failure_items %}∙ {{ loop.index }}. {{ item.file_name }}{% if item.quality %} · {{ item.quality }}{% endif %}{% if item.reason %} — {{ item.reason }}{% endif %}\n{% endfor %}\n{% if details_truncated %}∙ …另有 {{ omitted_failure_count }} 项未列出{% endif %}\n{{ tg_expandable_quote_start }}附属观测记录（点开）\n{% if wash_status %}∙ 洗版 ＝ {{ wash_status }}{% endif %}\n{% if failure_details %}∙ 错误 ＝ {{ failure_details }}{% endif %}{{ tg_expandable_quote_end }}\n· ° ˚ · ° ˚ ·\n∙ 观测时刻 ＝ {{ time_range or now }}\n{{ tg_italic_start }}今夜观测结束，数据已归档。{{ tg_italic_end }}"
+      }
+    },
+    {
+      "key": "library_quality_scan",
+      "name": "质量扫描",
+      "parent_type": "library_organize",
+      "template": {
+        "title": "🔭 天文观测日志·质检",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}观测日志 · 目标：质检{{ tg_italic_end }}\n· ° ˚ · ° ˚ ·\n{{ tg_bold_start }}◈ 观测数据{{ tg_bold_end }}\n{% if task_name %}∙ 任务 ＝ {{ task_name }}{% endif %}\n{% if total_count %}∙ 总计 ＝ {{ total_count }}{% endif %}\n{% if normal_count %}∙ 正常 ＝ {{ normal_count }}{% endif %}\n{% if problem_count %}∙ 问题 ＝ {{ problem_count }}{% endif %}\n{% if status_text %}∙ 状态 ＝ {{ status_text }}{% endif %}\n{% if elapsed %}∙ 曝光 ＝ {{ elapsed }}{% endif %}\n· ° ˚ · ° ˚ ·\n∙ 观测时刻 ＝ {{ now }}\n{{ tg_italic_start }}今夜观测结束，数据已归档。{{ tg_italic_end }}"
+      }
+    },
+    {
+      "key": "library_missing_scan",
+      "name": "缺集扫描",
+      "parent_type": "library_organize",
+      "template": {
+        "title": "🔭 天文观测日志·缺集",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}观测日志 · 目标：缺集{{ tg_italic_end }}\n· ° ˚ · ° ˚ ·\n{{ tg_bold_start }}◈ 观测数据{{ tg_bold_end }}\n{% if task_name %}∙ 任务 ＝ {{ task_name }}{% endif %}\n{% if total_count %}∙ 总计 ＝ {{ total_count }}{% endif %}\n{% if normal_count %}∙ 正常 ＝ {{ normal_count }}{% endif %}\n{% if problem_count %}∙ 问题 ＝ {{ problem_count }}{% endif %}\n{% if elapsed %}∙ 曝光 ＝ {{ elapsed }}{% endif %}\n{{ tg_bold_start }}待补清单{{ tg_bold_end }}\n{% for item in result_items %}∙ {{ loop.index }}. {{ item.series_name }}{% if item.missing_episodes %} 缺 {{ item.missing_episodes }}{% endif %}{% if item.instance_name %} · {{ item.instance_name }}{% endif %}\n{% endfor %}\n{% if results_truncated %}∙ …另有 {{ omitted_result_count }} 项未列出{% endif %}\n{{ tg_expandable_quote_start }}附属观测记录（点开）\n{% if result_details %}∙ 详情 ＝ {{ result_details }}{% endif %}{{ tg_expandable_quote_end }}\n· ° ˚ · ° ˚ ·\n∙ 观测时刻 ＝ {{ now }}\n{{ tg_italic_start }}今夜观测结束，数据已归档。{{ tg_italic_end }}"
+      }
+    },
+    {
+      "key": "strm_generate",
+      "name": "STRM 生成",
+      "parent_type": "library_organize",
+      "template": {
+        "title": "🔭 天文观测日志·STRM",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}观测日志 · 目标：STRM{{ tg_italic_end }}\n· ° ˚ · ° ˚ ·\n{{ tg_bold_start }}◈ 观测数据{{ tg_bold_end }}\n{% if show_name %}∙ 标题 ＝ {{ show_name }}{% endif %}\n{% if season_episode %}∙ 季集 ＝ {{ season_episode }}{% endif %}\n{% if file_count %}∙ STRM 数量 ＝ {{ file_count }}{% endif %}\n{% if strm_root %}∙ 根目录 ＝ {{ strm_root }}{% endif %}\n{% if episode_count %}∙ 集数 ＝ {{ episode_count }}{% endif %}\n{{ tg_bold_start }}目录树{{ tg_bold_end }}\n{{ tg_pre_start }}{% for item in strm_tree_items %}{{ item }}\n{% endfor %}{{ tg_pre_end }}\n{{ tg_expandable_quote_start }}附属观测记录（点开）\n{% if strm_path %}∙ STRM 路径 ＝ {{ strm_path }}{% endif %}{{ tg_expandable_quote_end }}\n· ° ˚ · ° ˚ ·\n∙ 观测时刻 ＝ {{ time_range or now }}\n{{ tg_italic_start }}今夜观测结束，数据已归档。{{ tg_italic_end }}"
+      }
+    },
+    {
+      "key": "share_receive",
+      "name": "分享转存",
+      "parent_type": "file_transfer",
+      "template": {
+        "title": "🔭 天文观测日志·转存",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}观测日志 · 目标：转存{{ tg_italic_end }}\n· ° ˚ · ° ˚ ·\n{{ tg_bold_start }}◈ 观测数据{{ tg_bold_end }}\n{% if status_text %}∙ 状态 ＝ {{ status_text }}{% endif %}\n{% if file_name %}∙ 文件名 ＝ {{ file_name }}{% endif %}\n{% if success_count %}∙ 捕获 ＝ {{ success_count }}{% endif %}\n{% if failed_count %}∙ 脱靶 ＝ {{ failed_count }}{% endif %}\n{% if elapsed %}∙ 曝光 ＝ {{ elapsed }}{% endif %}\n{% if transfer_source %}∙ 方位 ＝ {{ transfer_source }}{% endif %}\n{% if target_path %}∙ 落点 ＝ {{ target_path }}{% endif %}\n{{ tg_expandable_quote_start }}附属观测记录（点开）\n{% if error_message %}∙ 错误 ＝ {{ error_message }}{% endif %}\n{% if operation_type %}∙ 操作 ＝ {{ operation_type }}{% endif %}{{ tg_expandable_quote_end }}\n· ° ˚ · ° ˚ ·\n∙ 观测时刻 ＝ {{ now }}\n{{ tg_italic_start }}今夜观测结束，数据已归档。{{ tg_italic_end }}"
+      }
+    },
+    {
+      "key": "offline_download",
+      "name": "离线下载",
+      "parent_type": "file_transfer",
+      "template": {
+        "title": "🔭 天文观测日志·离线",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}观测日志 · 目标：离线{{ tg_italic_end }}\n· ° ˚ · ° ˚ ·\n{{ tg_bold_start }}◈ 观测数据{{ tg_bold_end }}\n{% if status_text %}∙ 状态 ＝ {{ status_text }}{% endif %}\n{% if file_name %}∙ 文件名 ＝ {{ file_name }}{% endif %}\n{% if success_count %}∙ 捕获 ＝ {{ success_count }}{% endif %}\n{% if failed_count %}∙ 脱靶 ＝ {{ failed_count }}{% endif %}\n{% if url_count %}∙ 链接数 ＝ {{ url_count }}{% endif %}\n{% if target_path %}∙ 落点 ＝ {{ target_path }}{% endif %}\n{% if transfer_source %}∙ 方位 ＝ {{ transfer_source }}{% endif %}\n{% if elapsed %}∙ 曝光 ＝ {{ elapsed }}{% endif %}\n{{ tg_expandable_quote_start }}附属观测记录（点开）\n{% if error_message %}∙ 错误 ＝ {{ error_message }}{% endif %}{{ tg_expandable_quote_end }}\n· ° ˚ · ° ˚ ·\n∙ 观测时刻 ＝ {{ now }}\n{{ tg_italic_start }}今夜观测结束，数据已归档。{{ tg_italic_end }}"
+      }
+    },
+    {
+      "key": "tg_auto_transfer",
+      "name": "TG 自动转存",
+      "parent_type": "file_transfer",
+      "template": {
+        "title": "🔭 天文观测日志·TG 转存",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}观测日志 · 目标：TG 转存{{ tg_italic_end }}\n· ° ˚ · ° ˚ ·\n{{ tg_bold_start }}◈ 观测数据{{ tg_bold_end }}\n{% if status_text %}∙ 状态 ＝ {{ status_text }}{% endif %}\n{% if source_name %}∙ 频道 ＝ {{ source_name }}{% endif %}\n{% if file_name %}∙ 文件名 ＝ {{ file_name }}{% endif %}\n{% if success_count %}∙ 捕获 ＝ {{ success_count }}{% endif %}\n{% if failed_count %}∙ 脱靶 ＝ {{ failed_count }}{% endif %}\n{% if target_path %}∙ 落点 ＝ {{ target_path }}{% endif %}\n{{ tg_expandable_quote_start }}附属观测记录（点开）\n{% if error_message %}∙ 错误 ＝ {{ error_message }}{% endif %}\n{% if operation_type %}∙ 操作 ＝ {{ operation_type }}{% endif %}{{ tg_expandable_quote_end }}\n· ° ˚ · ° ˚ ·\n∙ 观测时刻 ＝ {{ now }}\n{{ tg_italic_start }}今夜观测结束，数据已归档。{{ tg_italic_end }}"
+      }
+    },
+    {
+      "key": "tg_auto_offline",
+      "name": "TG 自动离线",
+      "parent_type": "file_transfer",
+      "template": {
+        "title": "🔭 天文观测日志·TG 离线",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}观测日志 · 目标：TG 离线{{ tg_italic_end }}\n· ° ˚ · ° ˚ ·\n{{ tg_bold_start }}◈ 观测数据{{ tg_bold_end }}\n{% if status_text %}∙ 状态 ＝ {{ status_text }}{% endif %}\n{% if source_name %}∙ 频道 ＝ {{ source_name }}{% endif %}\n{% if file_name %}∙ 文件名 ＝ {{ file_name }}{% endif %}\n{% if success_count %}∙ 捕获 ＝ {{ success_count }}{% endif %}\n{% if failed_count %}∙ 脱靶 ＝ {{ failed_count }}{% endif %}\n{% if url_count %}∙ 链接数 ＝ {{ url_count }}{% endif %}\n{% if target_path %}∙ 落点 ＝ {{ target_path }}{% endif %}\n{{ tg_expandable_quote_start }}附属观测记录（点开）\n{% if error_message %}∙ 错误 ＝ {{ error_message }}{% endif %}{{ tg_expandable_quote_end }}\n· ° ˚ · ° ˚ ·\n∙ 观测时刻 ＝ {{ now }}\n{{ tg_italic_start }}今夜观测结束，数据已归档。{{ tg_italic_end }}"
+      }
+    },
+    {
+      "key": "tg_video_download",
+      "name": "TG 视频下载",
+      "parent_type": "file_transfer",
+      "template": {
+        "title": "🔭 天文观测日志·TG 视频",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}观测日志 · 目标：TG 视频{{ tg_italic_end }}\n· ° ˚ · ° ˚ ·\n{{ tg_bold_start }}◈ 观测数据{{ tg_bold_end }}\n{% if status_text %}∙ 状态 ＝ {{ status_text }}{% endif %}\n{% if source_name %}∙ 频道 ＝ {{ source_name }}{% endif %}\n{% if file_name %}∙ 文件名 ＝ {{ file_name }}{% endif %}\n{% if total_size %}∙ 总大小 ＝ {{ total_size }}{% endif %}\n{% if target_path %}∙ 落点 ＝ {{ target_path }}{% endif %}\n{{ tg_expandable_quote_start }}附属观测记录（点开）\n{% if error_message %}∙ 错误 ＝ {{ error_message }}{% endif %}{{ tg_expandable_quote_end }}\n· ° ˚ · ° ˚ ·\n∙ 观测时刻 ＝ {{ now }}\n{{ tg_italic_start }}今夜观测结束，数据已归档。{{ tg_italic_end }}"
+      }
+    },
+    {
+      "key": "account_migration",
+      "name": "多号云迁移",
+      "parent_type": "file_transfer",
+      "template": {
+        "title": "🔭 天文观测日志·迁移",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}观测日志 · 目标：迁移{{ tg_italic_end }}\n· ° ˚ · ° ˚ ·\n{{ tg_bold_start }}◈ 观测数据{{ tg_bold_end }}\n{% if status_text %}∙ 状态 ＝ {{ status_text }}{% endif %}\n{% if file_name %}∙ 文件名 ＝ {{ file_name }}{% endif %}\n{% if success_count %}∙ 捕获 ＝ {{ success_count }}{% endif %}\n{% if failed_count %}∙ 脱靶 ＝ {{ failed_count }}{% endif %}\n{% if skipped_count %}∙ 跳过 ＝ {{ skipped_count }}{% endif %}\n{% if scanned_count %}∙ 扫描 ＝ {{ scanned_count }}{% endif %}\n{% if total_size %}∙ 总大小 ＝ {{ total_size }}{% endif %}\n{% if target_path %}∙ 落点 ＝ {{ target_path }}{% endif %}\n{% if elapsed %}∙ 曝光 ＝ {{ elapsed }}{% endif %}\n{{ tg_expandable_quote_start }}附属观测记录（点开）\n{% if error_message %}∙ 错误 ＝ {{ error_message }}{% endif %}{{ tg_expandable_quote_end }}\n· ° ˚ · ° ˚ ·\n∙ 观测时刻 ＝ {{ now }}\n{{ tg_italic_start }}今夜观测结束，数据已归档。{{ tg_italic_end }}"
+      }
+    },
+    {
+      "key": "ed2k_task",
+      "name": "ED2K 任务",
+      "parent_type": "file_transfer",
+      "template": {
+        "title": "🔭 天文观测日志·ED2K",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}观测日志 · 目标：ED2K{{ tg_italic_end }}\n· ° ˚ · ° ˚ ·\n{{ tg_bold_start }}◈ 观测数据{{ tg_bold_end }}\n{% if status_text %}∙ 状态 ＝ {{ status_text }}{% endif %}\n{% if title %}∙ 标题 ＝ {{ title }}{% endif %}\n{% if media_type %}∙ 媒体类型 ＝ {{ media_type }}{% endif %}\n{% if tmdb_id %}∙ TMDB ＝ {{ tmdb_id }}{% endif %}\n{% if file_name %}∙ 文件名 ＝ {{ file_name }}{% endif %}\n{% if success_count %}∙ 捕获 ＝ {{ success_count }}{% endif %}\n{% if failed_count %}∙ 脱靶 ＝ {{ failed_count }}{% endif %}\n{% if file_count %}∙ 帧数 ＝ {{ file_count }}{% endif %}\n{% if total_size %}∙ 总大小 ＝ {{ total_size }}{% endif %}\n{% if transfer_source %}∙ 方位 ＝ {{ transfer_source }}{% endif %}\n{% if elapsed %}∙ 曝光 ＝ {{ elapsed }}{% endif %}\n{{ tg_expandable_quote_start }}附属观测记录（点开）\n{% if details %}∙ 详情 ＝ {{ details }}{% endif %}\n{% if error_message %}∙ 错误 ＝ {{ error_message }}{% endif %}{{ tg_expandable_quote_end }}\n· ° ˚ · ° ˚ ·\n∙ 观测时刻 ＝ {{ now }}\n{{ tg_italic_start }}今夜观测结束，数据已归档。{{ tg_italic_end }}"
+      }
+    },
+    {
+      "key": "media_auto_share",
+      "name": "媒体自动分享",
+      "parent_type": "file_transfer",
+      "template": {
+        "title": "🔭 天文观测日志·分享",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}观测日志 · 目标：分享{{ tg_italic_end }}\n· ° ˚ · ° ˚ ·\n{{ tg_bold_start }}◈ 观测数据{{ tg_bold_end }}\n{% if title %}∙ 标题 ＝ {{ title }}{% endif %}\n{% if media_type %}∙ 媒体类型 ＝ {{ media_type }}{% endif %}\n{% if year %}∙ 年份 ＝ {{ year }}{% endif %}\n{% if file_count %}∙ 帧数 ＝ {{ file_count }}{% endif %}\n{% if total_size %}∙ 总大小 ＝ {{ total_size }}{% endif %}\n{% if quality %}∙ 视宁度 ＝ {{ quality }}{% endif %}\n{% if status_text %}∙ 状态 ＝ {{ status_text }}{% endif %}\n{% if target_path %}∙ 落点 ＝ {{ target_path }}{% endif %}\n{{ tg_expandable_quote_start }}附属观测记录（点开）\n{% if quality_comment %}∙ 画质点评 ＝ {{ quality_comment }}{% endif %}\n{% if actors %}∙ 演员 ＝ {{ actors }}{% endif %}\n{% if directors %}∙ 导演 ＝ {{ directors }}{% endif %}\n{% if details %}∙ 详情 ＝ {{ details }}{% endif %}\n{% if error_message %}∙ 错误 ＝ {{ error_message }}{% endif %}\n{% if tmdb_link %}∙ TMDB ＝ {{ tmdb_link }}{% endif %}\n{% if imdb_link %}∙ IMDb ＝ {{ imdb_link }}{% endif %}{{ tg_expandable_quote_end }}\n· ° ˚ · ° ˚ ·\n∙ 观测时刻 ＝ {{ now }}\n{{ tg_italic_start }}今夜观测结束，数据已归档。{{ tg_italic_end }}",
+        "quality_comments": {
+          "customized": true,
+          "dolby_vision": "Dolby Vision：暗弱星云的细节被完整留住。",
+          "hdr": "HDR：星点与尘埃的层次清晰。",
+          "4k": "4K：解析力足以分辨旋臂。",
+          "1080p": "1080P：视场干净。"
+        }
+      }
+    },
+    {
+      "key": "account_cookie_invalid",
+      "name": "Cookie 失效",
+      "parent_type": "account_status",
+      "template": {
+        "title": "🔭 天文观测日志·Cookie",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}观测日志 · 目标：Cookie{{ tg_italic_end }}\n· ° ˚ · ° ˚ ·\n{{ tg_bold_start }}◈ 观测数据{{ tg_bold_end }}\n{% if account_name %}∙ 账号 ＝ {{ account_name }}{% endif %}\n{% if status_message %}∙ 状态 ＝ {{ status_message }}{% endif %}\n{{ tg_expandable_quote_start }}附属观测记录（点开）\n{% if details %}∙ 详情 ＝ {{ details }}{% endif %}\n{% if error_message %}∙ 错误 ＝ {{ error_message }}{% endif %}{{ tg_expandable_quote_end }}\n· ° ˚ · ° ˚ ·\n∙ 观测时刻 ＝ {{ now }}\n{{ tg_italic_start }}今夜观测结束，数据已归档。{{ tg_italic_end }}"
+      }
+    },
+    {
+      "key": "account_switched",
+      "name": "账号切换",
+      "parent_type": "account_status",
+      "template": {
+        "title": "🔭 天文观测日志·切换",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}观测日志 · 目标：切换{{ tg_italic_end }}\n· ° ˚ · ° ˚ ·\n{{ tg_bold_start }}◈ 观测数据{{ tg_bold_end }}\n{% if account_name %}∙ 账号 ＝ {{ account_name }}{% endif %}\n{% if status_message %}∙ 状态 ＝ {{ status_message }}{% endif %}\n{% if operation_type %}∙ 操作 ＝ {{ operation_type }}{% endif %}\n{{ tg_expandable_quote_start }}附属观测记录（点开）\n{% if details %}∙ 详情 ＝ {{ details }}{% endif %}{{ tg_expandable_quote_end }}\n· ° ˚ · ° ˚ ·\n∙ 观测时刻 ＝ {{ now }}\n{{ tg_italic_start }}今夜观测结束，数据已归档。{{ tg_italic_end }}"
+      }
+    },
+    {
+      "key": "account_checkin",
+      "name": "115 签到",
+      "parent_type": "account_status",
+      "template": {
+        "title": "🔭 天文观测日志·签到",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}观测日志 · 目标：签到{{ tg_italic_end }}\n· ° ˚ · ° ˚ ·\n{{ tg_bold_start }}◈ 观测数据{{ tg_bold_end }}\n{% if account_name %}∙ 账号 ＝ {{ account_name }}{% endif %}\n{% if status_message %}∙ 状态 ＝ {{ status_message }}{% endif %}\n{% if points %}∙ 本次积分 ＝ {{ points }}{% endif %}\n{% if total_points %}∙ 总积分 ＝ {{ total_points }}{% endif %}\n{% if checkin_count %}∙ 累计签到 ＝ {{ checkin_count }} 次{% if checkin_points %} · {{ checkin_points }} 积分{% endif %}{% endif %}\n{{ tg_expandable_quote_start }}附属观测记录（点开）\n{% if details %}∙ 详情 ＝ {{ details }}{% endif %}{{ tg_expandable_quote_end }}\n· ° ˚ · ° ˚ ·\n∙ 观测时刻 ＝ {{ now }}\n{{ tg_italic_start }}今夜观测结束，数据已归档。{{ tg_italic_end }}"
+      }
+    },
+    {
+      "key": "dianying_checkin",
+      "name": "癫影签到",
+      "parent_type": "account_status",
+      "template": {
+        "title": "🔭 天文观测日志·癫影签到",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}观测日志 · 目标：癫影签到{{ tg_italic_end }}\n· ° ˚ · ° ˚ ·\n{{ tg_bold_start }}◈ 观测数据{{ tg_bold_end }}\n{% if account_name %}∙ 账号 ＝ {{ account_name }}{% endif %}\n{% if status_message %}∙ 状态 ＝ {{ status_message }}{% endif %}\n{% if points %}∙ 本次积分 ＝ {{ points }}{% endif %}\n{% if total_points %}∙ 总积分 ＝ {{ total_points }}{% endif %}\n{% if checkin_count %}∙ 累计签到 ＝ {{ checkin_count }} 次{% endif %}\n{{ tg_expandable_quote_start }}附属观测记录（点开）\n{% if details %}∙ 详情 ＝ {{ details }}{% endif %}{{ tg_expandable_quote_end }}\n· ° ˚ · ° ˚ ·\n∙ 观测时刻 ＝ {{ now }}\n{{ tg_italic_start }}今夜观测结束，数据已归档。{{ tg_italic_end }}"
+      }
+    },
+    {
+      "key": "container_update_check",
+      "name": "容器更新检查",
+      "parent_type": "container_update",
+      "template": {
+        "title": "🔭 天文观测日志·更新检查",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}观测日志 · 目标：更新检查{{ tg_italic_end }}\n· ° ˚ · ° ˚ ·\n{{ tg_bold_start }}◈ 观测数据{{ tg_bold_end }}\n{% if container_count %}∙ 容器总数 ＝ {{ container_count }}{% endif %}\n{% if available_count %}∙ 可更新 ＝ {{ available_count }}{% endif %}\n{% if current_count %}∙ 已最新 ＝ {{ current_count }}{% endif %}\n{% if check_error_count %}∙ 检查失败 ＝ {{ check_error_count }}{% endif %}\n{{ tg_expandable_quote_start }}附属观测记录（点开）\n{% if details %}∙ 详情 ＝ {{ details }}{% endif %}{{ tg_expandable_quote_end }}\n· ° ˚ · ° ˚ ·\n∙ 观测时刻 ＝ {{ now }}\n{{ tg_italic_start }}今夜观测结束，数据已归档。{{ tg_italic_end }}"
+      }
+    },
+    {
+      "key": "container_update_result",
+      "name": "容器更新结果",
+      "parent_type": "container_update",
+      "template": {
+        "title": "🔭 天文观测日志·更新结果",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}观测日志 · 目标：更新结果{{ tg_italic_end }}\n· ° ˚ · ° ˚ ·\n{{ tg_bold_start }}◈ 观测数据{{ tg_bold_end }}\n{% if trigger %}∙ 触发方式 ＝ {{ trigger }}{% endif %}\n{% if container_count %}∙ 容器总数 ＝ {{ container_count }}{% endif %}\n{% if success_count %}∙ 捕获 ＝ {{ success_count }}{% endif %}\n{% if failed_count %}∙ 脱靶 ＝ {{ failed_count }}{% endif %}\n{{ tg_expandable_quote_start }}附属观测记录（点开）\n{% if details %}∙ 详情 ＝ {{ details }}{% endif %}{{ tg_expandable_quote_end }}\n· ° ˚ · ° ˚ ·\n∙ 观测时刻 ＝ {{ now }}\n{{ tg_italic_start }}今夜观测结束，数据已归档。{{ tg_italic_end }}"
+      }
+    },
+    {
+      "key": "container_update_test",
+      "name": "容器通知测试",
+      "parent_type": "container_update",
+      "template": {
+        "title": "🔭 天文观测日志·通知测试",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}观测日志 · 目标：通知测试{{ tg_italic_end }}\n· ° ˚ · ° ˚ ·\n{{ tg_bold_start }}◈ 观测数据{{ tg_bold_end }}\n∙ 测试消息 ＝ {{ test_message or '容器更新消息推送通道工作正常' }}\n· ° ˚ · ° ˚ ·\n∙ 观测时刻 ＝ {{ now }}\n{{ tg_italic_start }}今夜观测结束，数据已归档。{{ tg_italic_end }}"
+      }
+    },
+    {
+      "key": "dian115_self_update",
+      "name": "Dian115 自更新",
+      "parent_type": "container_update",
+      "template": {
+        "title": "🔭 天文观测日志·自更新",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}观测日志 · 目标：自更新{{ tg_italic_end }}\n· ° ˚ · ° ˚ ·\n{{ tg_bold_start }}◈ 观测数据{{ tg_bold_end }}\n∙ 状态 ＝ {% if update_success %}✅ 更新成功{% else %}❌ 更新失败{% endif %}\n{% if current_version %}∙ 当前版本 ＝ {{ current_version }}{% endif %}\n{% if build_channel %}∙ 构建通道 ＝ {{ build_channel }}{% if build_commit %} · {{ build_commit }}{% endif %}{% endif %}\n{{ tg_expandable_quote_start }}附属观测记录（点开）\n{% if error_message %}∙ 错误 ＝ {{ error_message }}{% endif %}\n{% if details %}∙ 详情 ＝ {{ details }}{% endif %}{{ tg_expandable_quote_end }}\n· ° ˚ · ° ˚ ·\n∙ 观测时刻 ＝ {{ now }}\n{{ tg_italic_start }}今夜观测结束，数据已归档。{{ tg_italic_end }}"
+      }
+    },
+    {
+      "key": "proxy_health_daily_report",
+      "name": "Clash 监控日报",
+      "parent_type": "proxy_health",
+      "template": {
+        "title": "🔭 天文观测日志·监控日报",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}观测日志 · 目标：监控日报{{ tg_italic_end }}\n· ° ˚ · ° ˚ ·\n{{ tg_bold_start }}◈ 观测数据{{ tg_bold_end }}\n{% if day %}∙ 日期 ＝ {{ day }}{% endif %}\n{% if request_count %}∙ 请求数 ＝ {{ request_count }}{% endif %}\n{% if failure_count %}∙ 脱靶 ＝ {{ failure_count }}{% endif %}\n{% if success_rate %}∙ 成功率 ＝ {{ success_rate }}{% endif %}\n{% if switch_count %}∙ 切换次数 ＝ {{ switch_count }} 次{% if auto_switch_count or manual_switch_count %}（自动 {{ auto_switch_count }} / 手动 {{ manual_switch_count }}）{% endif %}{% endif %}\n{% if upload_size %}∙ 上传 ＝ {{ upload_size }}{% endif %}\n{% if download_size %}∙ 下载 ＝ {{ download_size }}{% endif %}\n{% if total_traffic_size %}∙ 总流量 ＝ {{ total_traffic_size }}{% endif %}\n· ° ˚ · ° ˚ ·\n∙ 观测时刻 ＝ {{ now }}\n{{ tg_italic_start }}今夜观测结束，数据已归档。{{ tg_italic_end }}"
+      }
+    },
+    {
+      "key": "proxy_health_test_report",
+      "name": "Clash 测试报告",
+      "parent_type": "proxy_health",
+      "template": {
+        "title": "🔭 天文观测日志·通道测试",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}观测日志 · 目标：通道测试{{ tg_italic_end }}\n· ° ˚ · ° ˚ ·\n{{ tg_bold_start }}◈ 观测数据{{ tg_bold_end }}\n{% if day %}∙ 日期 ＝ {{ day }}{% endif %}\n{% if request_count %}∙ 请求数 ＝ {{ request_count }}{% endif %}\n{% if failure_count %}∙ 脱靶 ＝ {{ failure_count }}{% endif %}\n{% if success_rate %}∙ 成功率 ＝ {{ success_rate }}{% endif %}\n{% if switch_count %}∙ 切换次数 ＝ {{ switch_count }} 次{% if auto_switch_count or manual_switch_count %}（自动 {{ auto_switch_count }} / 手动 {{ manual_switch_count }}）{% endif %}{% endif %}\n{% if upload_size %}∙ 上传 ＝ {{ upload_size }}{% endif %}\n{% if download_size %}∙ 下载 ＝ {{ download_size }}{% endif %}\n{% if total_traffic_size %}∙ 总流量 ＝ {{ total_traffic_size }}{% endif %}\n· ° ˚ · ° ˚ ·\n∙ 观测时刻 ＝ {{ now }}\n{{ tg_italic_start }}今夜观测结束，数据已归档。{{ tg_italic_end }}"
+      }
+    },
+    {
+      "key": "daily_statistics_report",
+      "name": "每日运行统计",
+      "parent_type": "statistics_report",
+      "template": {
+        "title": "🔭 天文观测日志·运行统计",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}观测日志 · 目标：运行统计{{ tg_italic_end }}\n· ° ˚ · ° ˚ ·\n{{ tg_bold_start }}◈ 观测数据{{ tg_bold_end }}\n{% if report_date %}∙ 报告日期 ＝ {{ report_date }}{% endif %}\n{% if period_label %}∙ 统计周期 ＝ {{ period_label }}{% endif %}\n{% if organized_count %}∙ 今日整理 ＝ {{ organized_count }}{% endif %}\n{% if new_count %}∙ 今日新增 ＝ {{ new_count }}{% endif %}\n{% if all_files %}∙ 全部文件 ＝ {{ all_files }}{% endif %}\n{% if emby_media_total %}∙ 媒体总数 ＝ {{ emby_media_total }}{% endif %}\n{% if wash_count %}∙ 今日洗版 ＝ {{ wash_count }}{% endif %}\n{% if transfer_count %}∙ 今日转存 ＝ {{ transfer_count }}{% endif %}\n{% if offline_count %}∙ 今日离线 ＝ {{ offline_count }}{% endif %}\n{{ tg_bold_start }}最新整理{{ tg_bold_end }}\n{% for item in latest_media %}∙ {{ loop.index }}. {{ item.title }}{% if item.type_year %} · {{ item.type_year }}{% endif %}{% if item.episode %} · {{ item.episode }}{% endif %}\n{% endfor %}\n{{ tg_expandable_quote_start }}附属观测记录（点开）\n{% if signature %}∙ 签名 ＝ {{ signature }}{% endif %}{{ tg_expandable_quote_end }}\n· ° ˚ · ° ˚ ·\n∙ 观测时刻 ＝ {{ generated_at or now }}\n{{ tg_italic_start }}今夜观测结束，数据已归档。{{ tg_italic_end }}"
+      }
+    },
+    {
+      "key": "emby_library_statistics_report",
+      "name": "Emby 媒体库统计",
+      "parent_type": "statistics_report",
+      "template": {
+        "title": "🔭 天文观测日志·库统计",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}观测日志 · 目标：库统计{{ tg_italic_end }}\n· ° ˚ · ° ˚ ·\n{{ tg_bold_start }}◈ 观测数据{{ tg_bold_end }}\n{% if library_name %}∙ 星表 ＝ {{ library_name }}{% endif %}\n{% if report_date %}∙ 报告日期 ＝ {{ report_date }}{% endif %}\n{% if period_label %}∙ 统计周期 ＝ {{ period_label }}{% endif %}\n{% if media_total %}∙ 媒体总数 ＝ {{ media_total }}{% endif %}\n{% if movie_count %}∙ 电影 ＝ {{ movie_count }}{% endif %}\n{% if series_count %}∙ 剧集 ＝ {{ series_count }}{% endif %}\n{% if season_count %}∙ 季 ＝ {{ season_count }}{% endif %}\n{% if episode_count %}∙ 集 ＝ {{ episode_count }}{% endif %}\n{% if all_files %}∙ 全部文件 ＝ {{ all_files }}{% endif %}\n{{ tg_bold_start }}最近入库{{ tg_bold_end }}\n{% for item in recent_media %}∙ {{ loop.index }}. {{ item.title }}{% if item.type_year %} · {{ item.type_year }}{% endif %}{% if item.episode %} · {{ item.episode }}{% endif %}\n{% endfor %}\n{{ tg_expandable_quote_start }}附属观测记录（点开）\n{% if signature %}∙ 签名 ＝ {{ signature }}{% endif %}{{ tg_expandable_quote_end }}\n· ° ˚ · ° ˚ ·\n∙ 观测时刻 ＝ {{ generated_at or now }}\n{{ tg_italic_start }}今夜观测结束，数据已归档。{{ tg_italic_end }}"
+      }
+    },
+    {
+      "key": "subscribe_added",
+      "name": "添加订阅",
+      "parent_type": "subscribe",
+      "template": {
+        "title": "🔭 天文观测日志·订阅添加",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}观测日志 · 目标：订阅添加{{ tg_italic_end }}\n· ° ˚ · ° ˚ ·\n{{ tg_bold_start }}◈ 观测数据{{ tg_bold_end }}\n{% if title_year %}∙ 标题 ＝ {{ title_year }}{% endif %}\n{% if season_episode %}∙ 季集 ＝ {{ season_episode }}{% endif %}\n{% if media_type %}∙ 媒体类型 ＝ {{ media_type }}{% endif %}\n{% if needed_episodes %}∙ 待补 ＝ {{ needed_episodes }}{% endif %}\n{% if channel %}∙ 渠道 ＝ {{ channel }}{% endif %}\n{% if rating %}∙ 星等 ＝ {{ rating }}{% endif %}\n{{ tg_expandable_quote_start }}附属观测记录（点开）\n{% if genres %}∙ 光谱型 ＝ {{ genres }}{% endif %}\n{% if actors %}∙ 演员 ＝ {{ actors }}{% endif %}\n{% if directors %}∙ 导演 ＝ {{ directors }}{% endif %}\n{% if overview %}∙ 目标概要 ＝ {{ overview }}{% endif %}\n{% if tmdb_link %}∙ TMDB ＝ {{ tmdb_link }}{% endif %}\n{% if imdb_link %}∙ IMDb ＝ {{ imdb_link }}{% endif %}{{ tg_expandable_quote_end }}\n· ° ˚ · ° ˚ ·\n∙ 观测时刻 ＝ {{ now }}\n{{ tg_italic_start }}今夜观测结束，数据已归档。{{ tg_italic_end }}"
+      }
+    },
+    {
+      "key": "subscribe_landed",
+      "name": "订阅完成",
+      "parent_type": "subscribe",
+      "template": {
+        "title": "🔭 天文观测日志·订阅完成",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}观测日志 · 目标：订阅完成{{ tg_italic_end }}\n· ° ˚ · ° ˚ ·\n{{ tg_bold_start }}◈ 观测数据{{ tg_bold_end }}\n{% if title_year %}∙ 标题 ＝ {{ title_year }}{% endif %}\n{% if season_episode %}∙ 季集 ＝ {{ season_episode }}{% endif %}\n{% if landed_via %}∙ 入库来源 ＝ {{ landed_via }}{% if landed_tag %} · {{ landed_tag }}{% endif %}{% endif %}\n{% if rating %}∙ 星等 ＝ {{ rating }}{% endif %}\n{{ tg_expandable_quote_start }}附属观测记录（点开）\n{% if genres %}∙ 光谱型 ＝ {{ genres }}{% endif %}\n{% if actors %}∙ 演员 ＝ {{ actors }}{% endif %}\n{% if directors %}∙ 导演 ＝ {{ directors }}{% endif %}\n{% if overview %}∙ 目标概要 ＝ {{ overview }}{% endif %}\n{% if tmdb_link %}∙ TMDB ＝ {{ tmdb_link }}{% endif %}\n{% if imdb_link %}∙ IMDb ＝ {{ imdb_link }}{% endif %}{{ tg_expandable_quote_end }}\n· ° ˚ · ° ˚ ·\n∙ 观测时刻 ＝ {{ now }}\n{{ tg_italic_start }}今夜观测结束，数据已归档。{{ tg_italic_end }}"
+      }
+    },
+    {
+      "key": "subscribe_partial",
+      "name": "订阅部分完成",
+      "parent_type": "subscribe",
+      "template": {
+        "title": "🔭 天文观测日志·订阅进展",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}观测日志 · 目标：订阅进展{{ tg_italic_end }}\n· ° ˚ · ° ˚ ·\n{{ tg_bold_start }}◈ 观测数据{{ tg_bold_end }}\n{% if title_year %}∙ 标题 ＝ {{ title_year }}{% endif %}\n{% if season_episode %}∙ 季集 ＝ {{ season_episode }}{% endif %}\n{% if covered_episodes %}∙ 已覆盖 ＝ {{ covered_episodes }}{% endif %}\n{% if needed_episodes %}∙ 待补 ＝ {{ needed_episodes }}{% endif %}\n{% if landed_via %}∙ 入库来源 ＝ {{ landed_via }}{% if landed_tag %} · {{ landed_tag }}{% endif %}{% endif %}\n{{ tg_expandable_quote_start }}附属观测记录（点开）\n{% if genres %}∙ 光谱型 ＝ {{ genres }}{% endif %}\n{% if actors %}∙ 演员 ＝ {{ actors }}{% endif %}\n{% if directors %}∙ 导演 ＝ {{ directors }}{% endif %}\n{% if overview %}∙ 目标概要 ＝ {{ overview }}{% endif %}\n{% if tmdb_link %}∙ TMDB ＝ {{ tmdb_link }}{% endif %}\n{% if imdb_link %}∙ IMDb ＝ {{ imdb_link }}{% endif %}{{ tg_expandable_quote_end }}\n· ° ˚ · ° ˚ ·\n∙ 观测时刻 ＝ {{ now }}\n{{ tg_italic_start }}今夜观测结束，数据已归档。{{ tg_italic_end }}"
+      }
+    },
+    {
+      "key": "plugin_notification_message",
+      "name": "插件任务结果",
+      "parent_type": "plugin_notification",
+      "template": {
+        "title": "🔭 天文观测日志·插件",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}观测日志 · 目标：插件{{ tg_italic_end }}\n· ° ˚ · ° ˚ ·\n{{ tg_bold_start }}◈ 观测数据{{ tg_bold_end }}\n∙ 级别 ＝ {{ level_icon }} {{ level_text }}\n{% if plugin_name %}∙ 插件 ＝ {{ plugin_name }}{% endif %}\n{% if plugin_title %}∙ 标题 ＝ {{ plugin_title }}{% endif %}\n{% if plugin_body %}∙ 消息 ＝ {{ plugin_body }}{% endif %}\n{% if job_ref %}∙ 任务编号 ＝ {{ job_ref }}{% endif %}\n· ° ˚ · ° ˚ ·\n∙ 观测时刻 ＝ {{ now }}\n{{ tg_italic_start }}今夜观测结束，数据已归档。{{ tg_italic_end }}"
+      }
+    }
+  ]
+}

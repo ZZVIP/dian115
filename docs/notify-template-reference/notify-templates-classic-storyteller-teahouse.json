@@ -1,0 +1,548 @@
+{
+  "format": "dian115-notify-template-package",
+  "version": 2,
+  "exported_at": "2026-09-27T10:00:00+08:00",
+  "templates": [
+    {
+      "key": "playback_start",
+      "name": "开始播放",
+      "parent_type": "playback",
+      "template": {
+        "title": "📖 茶馆说书·开播",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}话说这厢开播，各位看官听真——{{ tg_italic_end }}\n～ ❖ ～ ❖ ～\n{{ tg_bold_start }}【正文】{{ tg_bold_end }}\n{% if title_year %}❖ 标题曰：{{ title_year }}{% endif %}\n{% if season_episode %}❖ 季集曰：{{ season_episode }}{% endif %}\n{% if media_type %}❖ 媒体类型曰：{{ media_type }}{% endif %}\n{% if user_name %}❖ 座上客曰：{{ user_name }}{% endif %}\n{% if client %}❖ 客户端曰：{{ client }}{% endif %}\n{% if device_name %}❖ 茶位曰：{{ device_name }}{% endif %}\n{% if emby_instance_name %}❖ 实例曰：{{ emby_instance_name }}{% endif %}\n{% if position_time %}❖ 播放位置曰：{{ position_time }}{% endif %}\n{% if runtime_time %}❖ 总时长曰：{{ runtime_time }}{% endif %}\n{% if quality %}❖ 成色曰：{{ quality }}{% endif %}\n{% if rating %}❖ 叫座曰：{{ rating }}{% endif %}\n{{ tg_expandable_quote_start }}书外闲篇（点开）\n{% if quality_comment %}❖ 画质点评曰：{{ quality_comment }}{% endif %}\n{% if genres %}❖ 行当曰：{{ genres }}{% endif %}\n{% if actors %}❖ 演员曰：{{ actors }}{% endif %}\n{% if directors %}❖ 导演曰：{{ directors }}{% endif %}\n{% if overview %}❖ 段子大意曰：{{ overview }}{% endif %}\n{% if ip %}❖ IP 地址曰：{{ ip }}{% endif %}\n{% if tmdb_link %}❖ TMDB曰：{{ tmdb_link }}{% endif %}\n{% if imdb_link %}❖ IMDb曰：{{ imdb_link }}{% endif %}{{ tg_expandable_quote_end }}\n～ ❖ ～ ❖ ～\n❖ 开书时辰曰：{{ now }}\n{{ tg_bold_start }}啪！惊堂木一响，且听下回分解。{{ tg_bold_end }}",
+        "quality_comments": {
+          "customized": true,
+          "dolby_vision": "Dolby Vision：这一出光影，真真是极好的。",
+          "hdr": "HDR：明暗有致，层次分明。",
+          "4k": "4K：须眉毕现。",
+          "1080p": "1080P：清清楚楚。"
+        }
+      }
+    },
+    {
+      "key": "playback_stop",
+      "name": "停止播放",
+      "parent_type": "playback",
+      "template": {
+        "title": "📖 茶馆说书·停播",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}话说这厢停播，各位看官听真——{{ tg_italic_end }}\n～ ❖ ～ ❖ ～\n{{ tg_bold_start }}【正文】{{ tg_bold_end }}\n{% if title_year %}❖ 标题曰：{{ title_year }}{% endif %}\n{% if season_episode %}❖ 季集曰：{{ season_episode }}{% endif %}\n{% if media_type %}❖ 媒体类型曰：{{ media_type }}{% endif %}\n{% if percentage %}❖ 播放进度曰：{{ percentage }}%{% endif %}\n{% if user_name %}❖ 座上客曰：{{ user_name }}{% endif %}\n{% if device_name %}❖ 茶位曰：{{ device_name }}{% endif %}\n{% if client %}❖ 客户端曰：{{ client }}{% endif %}\n{% if emby_instance_name %}❖ 实例曰：{{ emby_instance_name }}{% endif %}\n{% if position_time %}❖ 播放位置曰：{{ position_time }}{% endif %}\n{% if runtime_time %}❖ 总时长曰：{{ runtime_time }}{% endif %}\n{% if remaining_time %}❖ 剩余时间曰：{{ remaining_time }}{% endif %}\n{% if quality %}❖ 成色曰：{{ quality }}{% endif %}\n{{ tg_expandable_quote_start }}书外闲篇（点开）\n{% if quality_comment %}❖ 画质点评曰：{{ quality_comment }}{% endif %}\n{% if genres %}❖ 行当曰：{{ genres }}{% endif %}\n{% if actors %}❖ 演员曰：{{ actors }}{% endif %}\n{% if directors %}❖ 导演曰：{{ directors }}{% endif %}\n{% if overview %}❖ 段子大意曰：{{ overview }}{% endif %}\n{% if ip %}❖ IP 地址曰：{{ ip }}{% endif %}\n{% if tmdb_link %}❖ TMDB曰：{{ tmdb_link }}{% endif %}\n{% if imdb_link %}❖ IMDb曰：{{ imdb_link }}{% endif %}{{ tg_expandable_quote_end }}\n～ ❖ ～ ❖ ～\n❖ 开书时辰曰：{{ now }}\n{{ tg_bold_start }}啪！惊堂木一响，且听下回分解。{{ tg_bold_end }}",
+        "quality_comments": {
+          "customized": true,
+          "dolby_vision": "Dolby Vision：这一出光影，真真是极好的。",
+          "hdr": "HDR：明暗有致，层次分明。",
+          "4k": "4K：须眉毕现。",
+          "1080p": "1080P：清清楚楚。"
+        }
+      }
+    },
+    {
+      "key": "media_library_add",
+      "name": "资源入库",
+      "parent_type": "media_library",
+      "template": {
+        "title": "📖 茶馆说书·入库",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}话说这厢入库，各位看官听真——{{ tg_italic_end }}\n～ ❖ ～ ❖ ～\n{{ tg_bold_start }}【正文】{{ tg_bold_end }}\n{% if title_year %}❖ 标题曰：{{ title_year }}{% endif %}\n{% if season_episode %}❖ 季集曰：{{ season_episode }}{% endif %}\n{% if media_type %}❖ 媒体类型曰：{{ media_type }}{% endif %}\n{% if library_name %}❖ 媒体库曰：{{ library_name }}{% endif %}\n{% if file_count %}❖ 文件数曰：{{ file_count }}{% endif %}\n{% if episode_count %}❖ 集数曰：{{ episode_count }}{% endif %}\n{% if total_size %}❖ 总大小曰：{{ total_size }}{% endif %}\n{% if quality %}❖ 成色曰：{{ quality }}{% endif %}\n{% if status %}❖ 状态曰：{{ status }}{% endif %}\n{% if emby_instance_name %}❖ 实例曰：{{ emby_instance_name }}{% endif %}\n{{ tg_expandable_quote_start }}书外闲篇（点开）\n{% if quality_comment %}❖ 画质点评曰：{{ quality_comment }}{% endif %}\n{% if genres %}❖ 行当曰：{{ genres }}{% endif %}\n{% if actors %}❖ 演员曰：{{ actors }}{% endif %}\n{% if directors %}❖ 导演曰：{{ directors }}{% endif %}\n{% if overview %}❖ 段子大意曰：{{ overview }}{% endif %}\n{% if tmdb_link %}❖ TMDB曰：{{ tmdb_link }}{% endif %}\n{% if imdb_link %}❖ IMDb曰：{{ imdb_link }}{% endif %}{{ tg_expandable_quote_end }}\n～ ❖ ～ ❖ ～\n❖ 开书时辰曰：{{ time_range or now }}\n{{ tg_bold_start }}啪！惊堂木一响，且听下回分解。{{ tg_bold_end }}",
+        "quality_comments": {
+          "customized": true,
+          "dolby_vision": "Dolby Vision：这一出光影，真真是极好的。",
+          "hdr": "HDR：明暗有致，层次分明。",
+          "4k": "4K：须眉毕现。",
+          "1080p": "1080P：清清楚楚。"
+        }
+      }
+    },
+    {
+      "key": "media_library_update",
+      "name": "媒体更新",
+      "parent_type": "media_library",
+      "template": {
+        "title": "📖 茶馆说书·更新",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}话说这厢更新，各位看官听真——{{ tg_italic_end }}\n～ ❖ ～ ❖ ～\n{{ tg_bold_start }}【正文】{{ tg_bold_end }}\n{% if title_year %}❖ 标题曰：{{ title_year }}{% endif %}\n{% if season_episode %}❖ 季集曰：{{ season_episode }}{% endif %}\n{% if media_type %}❖ 媒体类型曰：{{ media_type }}{% endif %}\n{% if library_name %}❖ 媒体库曰：{{ library_name }}{% endif %}\n{% if file_count %}❖ 文件数曰：{{ file_count }}{% endif %}\n{% if total_size %}❖ 总大小曰：{{ total_size }}{% endif %}\n{% if quality %}❖ 成色曰：{{ quality }}{% endif %}\n{% if event_action %}❖ 事件动作曰：{{ event_action }}{% endif %}\n{% if status %}❖ 状态曰：{{ status }}{% endif %}\n{% if emby_instance_name %}❖ 实例曰：{{ emby_instance_name }}{% endif %}\n{% if item_id %}❖ 项目 ID曰：{{ item_id }}{% endif %}\n{{ tg_expandable_quote_start }}书外闲篇（点开）\n{% if quality_comment %}❖ 画质点评曰：{{ quality_comment }}{% endif %}\n{% if genres %}❖ 行当曰：{{ genres }}{% endif %}\n{% if actors %}❖ 演员曰：{{ actors }}{% endif %}\n{% if directors %}❖ 导演曰：{{ directors }}{% endif %}\n{% if overview %}❖ 段子大意曰：{{ overview }}{% endif %}\n{% if tmdb_link %}❖ TMDB曰：{{ tmdb_link }}{% endif %}\n{% if imdb_link %}❖ IMDb曰：{{ imdb_link }}{% endif %}{{ tg_expandable_quote_end }}\n～ ❖ ～ ❖ ～\n❖ 开书时辰曰：{{ time_range or now }}\n{{ tg_bold_start }}啪！惊堂木一响，且听下回分解。{{ tg_bold_end }}",
+        "quality_comments": {
+          "customized": true,
+          "dolby_vision": "Dolby Vision：这一出光影，真真是极好的。",
+          "hdr": "HDR：明暗有致，层次分明。",
+          "4k": "4K：须眉毕现。",
+          "1080p": "1080P：清清楚楚。"
+        }
+      }
+    },
+    {
+      "key": "emby_user_authenticated",
+      "name": "用户登录成功",
+      "parent_type": "emby_security",
+      "template": {
+        "title": "📖 茶馆说书·登录",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}话说这厢登录，各位看官听真——{{ tg_italic_end }}\n～ ❖ ～ ❖ ～\n{{ tg_bold_start }}【正文】{{ tg_bold_end }}\n{% if user_name %}❖ 座上客曰：{{ user_name }}{% endif %}\n{% if device_name %}❖ 茶位曰：{{ device_name }}{% endif %}\n{% if severity %}❖ 级别曰：{{ severity }}{% endif %}\n{% if description %}❖ 描述曰：{{ description }}{% endif %}\n❖ 实例曰：{{ emby_instance_name or server_name }}\n{{ tg_expandable_quote_start }}书外闲篇（点开）\n{% if url %}❖ 链接曰：{{ url }}{% endif %}{{ tg_expandable_quote_end }}\n～ ❖ ～ ❖ ～\n❖ 开书时辰曰：{{ now }}\n{{ tg_bold_start }}啪！惊堂木一响，且听下回分解。{{ tg_bold_end }}"
+      }
+    },
+    {
+      "key": "emby_user_authentication_failed",
+      "name": "用户登录失败",
+      "parent_type": "emby_security",
+      "template": {
+        "title": "📖 茶馆说书·登录失败",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}话说这厢登录失败，各位看官听真——{{ tg_italic_end }}\n～ ❖ ～ ❖ ～\n{{ tg_bold_start }}【正文】{{ tg_bold_end }}\n{% if user_name %}❖ 座上客曰：{{ user_name }}{% endif %}\n{% if device_name %}❖ 茶位曰：{{ device_name }}{% endif %}\n{% if severity %}❖ 级别曰：{{ severity }}{% endif %}\n{% if description %}❖ 描述曰：{{ description }}{% endif %}\n❖ 实例曰：{{ emby_instance_name or server_name }}\n{{ tg_expandable_quote_start }}书外闲篇（点开）\n{% if url %}❖ 链接曰：{{ url }}{% endif %}{{ tg_expandable_quote_end }}\n～ ❖ ～ ❖ ～\n❖ 开书时辰曰：{{ now }}\n{{ tg_bold_start }}啪！惊堂木一响，且听下回分解。{{ tg_bold_end }}"
+      }
+    },
+    {
+      "key": "emby_user_locked_out",
+      "name": "用户被锁定",
+      "parent_type": "emby_security",
+      "template": {
+        "title": "📖 茶馆说书·锁定",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}话说这厢锁定，各位看官听真——{{ tg_italic_end }}\n～ ❖ ～ ❖ ～\n{{ tg_bold_start }}【正文】{{ tg_bold_end }}\n{% if user_name %}❖ 座上客曰：{{ user_name }}{% endif %}\n{% if severity %}❖ 级别曰：{{ severity }}{% endif %}\n{% if description %}❖ 描述曰：{{ description }}{% endif %}\n❖ 实例曰：{{ emby_instance_name or server_name }}\n{{ tg_expandable_quote_start }}书外闲篇（点开）\n{% if url %}❖ 链接曰：{{ url }}{% endif %}{{ tg_expandable_quote_end }}\n～ ❖ ～ ❖ ～\n❖ 开书时辰曰：{{ now }}\n{{ tg_bold_start }}啪！惊堂木一响，且听下回分解。{{ tg_bold_end }}"
+      }
+    },
+    {
+      "key": "emby_user_created",
+      "name": "用户已创建",
+      "parent_type": "emby_security",
+      "template": {
+        "title": "📖 茶馆说书·新建用户",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}话说这厢新建用户，各位看官听真——{{ tg_italic_end }}\n～ ❖ ～ ❖ ～\n{{ tg_bold_start }}【正文】{{ tg_bold_end }}\n{% if user_name %}❖ 座上客曰：{{ user_name }}{% endif %}\n{% if device_name %}❖ 茶位曰：{{ device_name }}{% endif %}\n{% if severity %}❖ 级别曰：{{ severity }}{% endif %}\n{% if description %}❖ 描述曰：{{ description }}{% endif %}\n❖ 实例曰：{{ emby_instance_name or server_name }}\n{{ tg_expandable_quote_start }}书外闲篇（点开）\n{% if url %}❖ 链接曰：{{ url }}{% endif %}{{ tg_expandable_quote_end }}\n～ ❖ ～ ❖ ～\n❖ 开书时辰曰：{{ now }}\n{{ tg_bold_start }}啪！惊堂木一响，且听下回分解。{{ tg_bold_end }}"
+      }
+    },
+    {
+      "key": "emby_user_deleted",
+      "name": "用户已删除",
+      "parent_type": "emby_security",
+      "template": {
+        "title": "📖 茶馆说书·删除用户",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}话说这厢删除用户，各位看官听真——{{ tg_italic_end }}\n～ ❖ ～ ❖ ～\n{{ tg_bold_start }}【正文】{{ tg_bold_end }}\n{% if user_name %}❖ 座上客曰：{{ user_name }}{% endif %}\n{% if severity %}❖ 级别曰：{{ severity }}{% endif %}\n{% if description %}❖ 描述曰：{{ description }}{% endif %}\n❖ 实例曰：{{ emby_instance_name or server_name }}\n{{ tg_expandable_quote_start }}书外闲篇（点开）\n{% if url %}❖ 链接曰：{{ url }}{% endif %}{{ tg_expandable_quote_end }}\n～ ❖ ～ ❖ ～\n❖ 开书时辰曰：{{ now }}\n{{ tg_bold_start }}啪！惊堂木一响，且听下回分解。{{ tg_bold_end }}"
+      }
+    },
+    {
+      "key": "emby_user_password_changed",
+      "name": "用户密码更改",
+      "parent_type": "emby_security",
+      "template": {
+        "title": "📖 茶馆说书·改密",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}话说这厢改密，各位看官听真——{{ tg_italic_end }}\n～ ❖ ～ ❖ ～\n{{ tg_bold_start }}【正文】{{ tg_bold_end }}\n{% if user_name %}❖ 座上客曰：{{ user_name }}{% endif %}\n{% if device_name %}❖ 茶位曰：{{ device_name }}{% endif %}\n{% if severity %}❖ 级别曰：{{ severity }}{% endif %}\n{% if description %}❖ 描述曰：{{ description }}{% endif %}\n❖ 实例曰：{{ emby_instance_name or server_name }}\n{{ tg_expandable_quote_start }}书外闲篇（点开）\n{% if url %}❖ 链接曰：{{ url }}{% endif %}{{ tg_expandable_quote_end }}\n～ ❖ ～ ❖ ～\n❖ 开书时辰曰：{{ now }}\n{{ tg_bold_start }}啪！惊堂木一响，且听下回分解。{{ tg_bold_end }}"
+      }
+    },
+    {
+      "key": "emby_user_policy_updated",
+      "name": "用户策略更新",
+      "parent_type": "emby_security",
+      "template": {
+        "title": "📖 茶馆说书·策略",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}话说这厢策略，各位看官听真——{{ tg_italic_end }}\n～ ❖ ～ ❖ ～\n{{ tg_bold_start }}【正文】{{ tg_bold_end }}\n{% if user_name %}❖ 座上客曰：{{ user_name }}{% endif %}\n{% if severity %}❖ 级别曰：{{ severity }}{% endif %}\n{% if description %}❖ 描述曰：{{ description }}{% endif %}\n❖ 实例曰：{{ emby_instance_name or server_name }}\n{{ tg_expandable_quote_start }}书外闲篇（点开）\n{% if url %}❖ 链接曰：{{ url }}{% endif %}{{ tg_expandable_quote_end }}\n～ ❖ ～ ❖ ～\n❖ 开书时辰曰：{{ now }}\n{{ tg_bold_start }}啪！惊堂木一响，且听下回分解。{{ tg_bold_end }}"
+      }
+    },
+    {
+      "key": "library_organize_success",
+      "name": "整理完成",
+      "parent_type": "library_organize",
+      "template": {
+        "title": "📖 茶馆说书·整理完成",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}话说这厢整理完成，各位看官听真——{{ tg_italic_end }}\n～ ❖ ～ ❖ ～\n{{ tg_bold_start }}【正文】{{ tg_bold_end }}\n{% if title_year %}❖ 标题曰：{{ title_year }}{% endif %}\n{% if season_episode %}❖ 季集曰：{{ season_episode }}{% endif %}\n{% if media_type %}❖ 媒体类型曰：{{ media_type }}{% endif %}\n{% if action_text %}❖ 动作曰：{{ action_text }}{% endif %}\n{% if file_count %}❖ 文件数曰：{{ file_count }}{% endif %}\n{% if episode_count %}❖ 集数曰：{{ episode_count }}{% endif %}\n{% if total_size %}❖ 总大小曰：{{ total_size }}{% endif %}\n{% if quality %}❖ 成色曰：{{ quality }}{% endif %}\n{% if year %}❖ 年份曰：{{ year }}{% endif %}\n{% if rating %}❖ 叫座曰：{{ rating }}{% endif %}\n{% if is_wash %}❖ 洗版曰：{{ wash_status or '洗版完成' }}{% if wash_reason %} · {{ wash_reason }}{% endif %}{% endif %}\n{% if genres %}❖ 行当曰：{{ genres }}{% endif %}\n{{ tg_expandable_quote_start }}书外闲篇（点开）\n{% if quality_comment %}❖ 画质点评曰：{{ quality_comment }}{% endif %}\n{% if overview %}❖ 段子大意曰：{{ overview }}{% endif %}\n{% if source_path %}❖ 来路曰：{{ source_path }}{% endif %}\n{% if target_path %}❖ 落脚处曰：{{ target_path }}{% endif %}\n{% if tmdb_link %}❖ TMDB曰：{{ tmdb_link }}{% endif %}\n{% if imdb_link %}❖ IMDb曰：{{ imdb_link }}{% endif %}{{ tg_expandable_quote_end }}\n～ ❖ ～ ❖ ～\n❖ 开书时辰曰：{{ time_range or now }}\n{{ tg_bold_start }}啪！惊堂木一响，且听下回分解。{{ tg_bold_end }}",
+        "quality_comments": {
+          "customized": true,
+          "dolby_vision": "Dolby Vision：这一出光影，真真是极好的。",
+          "hdr": "HDR：明暗有致，层次分明。",
+          "4k": "4K：须眉毕现。",
+          "1080p": "1080P：清清楚楚。"
+        }
+      }
+    },
+    {
+      "key": "library_organize_skip",
+      "name": "整理跳过",
+      "parent_type": "library_organize",
+      "template": {
+        "title": "📖 茶馆说书·整理跳过",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}话说这厢整理跳过，各位看官听真——{{ tg_italic_end }}\n～ ❖ ～ ❖ ～\n{{ tg_bold_start }}【正文】{{ tg_bold_end }}\n{% if title_year %}❖ 标题曰：{{ title_year }}{% endif %}\n{% if season_episode %}❖ 季集曰：{{ season_episode }}{% endif %}\n{% if media_type %}❖ 媒体类型曰：{{ media_type }}{% endif %}\n{% if skip_reason %}❖ 原因曰：{{ skip_reason }}{% endif %}\n{% if wash_reason %}❖ 原因曰：{{ wash_reason }}{% endif %}\n{% if source_path %}❖ 来路曰：{{ source_path }}{% endif %}\n{% if quality %}❖ 成色曰：{{ quality }}{% endif %}\n{% if rating %}❖ 叫座曰：{{ rating }}{% endif %}\n{{ tg_expandable_quote_start }}书外闲篇（点开）\n{% if quality_comment %}❖ 画质点评曰：{{ quality_comment }}{% endif %}\n{% if genres %}❖ 行当曰：{{ genres }}{% endif %}\n{% if overview %}❖ 段子大意曰：{{ overview }}{% endif %}\n{% if target_path %}❖ 落脚处曰：{{ target_path }}{% endif %}\n{% if tmdb_link %}❖ TMDB曰：{{ tmdb_link }}{% endif %}\n{% if imdb_link %}❖ IMDb曰：{{ imdb_link }}{% endif %}{{ tg_expandable_quote_end }}\n～ ❖ ～ ❖ ～\n❖ 开书时辰曰：{{ time_range or now }}\n{{ tg_bold_start }}啪！惊堂木一响，且听下回分解。{{ tg_bold_end }}",
+        "quality_comments": {
+          "customized": true,
+          "dolby_vision": "Dolby Vision：这一出光影，真真是极好的。",
+          "hdr": "HDR：明暗有致，层次分明。",
+          "4k": "4K：须眉毕现。",
+          "1080p": "1080P：清清楚楚。"
+        }
+      }
+    },
+    {
+      "key": "library_organize_fail",
+      "name": "整理失败",
+      "parent_type": "library_organize",
+      "template": {
+        "title": "📖 茶馆说书·整理失败",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}话说这厢整理失败，各位看官听真——{{ tg_italic_end }}\n～ ❖ ～ ❖ ～\n{{ tg_bold_start }}【正文】{{ tg_bold_end }}\n{% if failure_count %}❖ 问题曰：{{ failure_count }}{% endif %}\n{% if action_text %}❖ 动作曰：{{ action_text }}{% endif %}\n{% if title %}❖ 标题曰：{{ title }}{% endif %}\n{% if source_path %}❖ 来路曰：{{ source_path }}{% endif %}\n{% if target_path %}❖ 落脚处曰：{{ target_path }}{% endif %}\n{% if error_message %}❖ 错误曰：{{ error_message }}{% endif %}\n{{ tg_bold_start }}失败明细{{ tg_bold_end }}\n{% for item in failure_items %}❖ {{ loop.index }}. {{ item.file_name }}{% if item.quality %} · {{ item.quality }}{% endif %}{% if item.reason %} — {{ item.reason }}{% endif %}\n{% endfor %}\n{% if details_truncated %}❖ …另有 {{ omitted_failure_count }} 项未列出{% endif %}\n{{ tg_expandable_quote_start }}书外闲篇（点开）\n{% if wash_status %}❖ 洗版曰：{{ wash_status }}{% endif %}\n{% if failure_details %}❖ 错误曰：{{ failure_details }}{% endif %}{{ tg_expandable_quote_end }}\n～ ❖ ～ ❖ ～\n❖ 开书时辰曰：{{ time_range or now }}\n{{ tg_bold_start }}啪！惊堂木一响，且听下回分解。{{ tg_bold_end }}"
+      }
+    },
+    {
+      "key": "library_quality_scan",
+      "name": "质量扫描",
+      "parent_type": "library_organize",
+      "template": {
+        "title": "📖 茶馆说书·质检",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}话说这厢质检，各位看官听真——{{ tg_italic_end }}\n～ ❖ ～ ❖ ～\n{{ tg_bold_start }}【正文】{{ tg_bold_end }}\n{% if task_name %}❖ 任务曰：{{ task_name }}{% endif %}\n{% if total_count %}❖ 总计曰：{{ total_count }}{% endif %}\n{% if normal_count %}❖ 正常曰：{{ normal_count }}{% endif %}\n{% if problem_count %}❖ 问题曰：{{ problem_count }}{% endif %}\n{% if status_text %}❖ 状态曰：{{ status_text }}{% endif %}\n{% if elapsed %}❖ 工夫曰：{{ elapsed }}{% endif %}\n～ ❖ ～ ❖ ～\n❖ 开书时辰曰：{{ now }}\n{{ tg_bold_start }}啪！惊堂木一响，且听下回分解。{{ tg_bold_end }}"
+      }
+    },
+    {
+      "key": "library_missing_scan",
+      "name": "缺集扫描",
+      "parent_type": "library_organize",
+      "template": {
+        "title": "📖 茶馆说书·缺集",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}话说这厢缺集，各位看官听真——{{ tg_italic_end }}\n～ ❖ ～ ❖ ～\n{{ tg_bold_start }}【正文】{{ tg_bold_end }}\n{% if task_name %}❖ 任务曰：{{ task_name }}{% endif %}\n{% if total_count %}❖ 总计曰：{{ total_count }}{% endif %}\n{% if normal_count %}❖ 正常曰：{{ normal_count }}{% endif %}\n{% if problem_count %}❖ 问题曰：{{ problem_count }}{% endif %}\n{% if elapsed %}❖ 工夫曰：{{ elapsed }}{% endif %}\n{{ tg_bold_start }}待补清单{{ tg_bold_end }}\n{% for item in result_items %}❖ {{ loop.index }}. {{ item.series_name }}{% if item.missing_episodes %} 缺 {{ item.missing_episodes }}{% endif %}{% if item.instance_name %} · {{ item.instance_name }}{% endif %}\n{% endfor %}\n{% if results_truncated %}❖ …另有 {{ omitted_result_count }} 项未列出{% endif %}\n{{ tg_expandable_quote_start }}书外闲篇（点开）\n{% if result_details %}❖ 详情曰：{{ result_details }}{% endif %}{{ tg_expandable_quote_end }}\n～ ❖ ～ ❖ ～\n❖ 开书时辰曰：{{ now }}\n{{ tg_bold_start }}啪！惊堂木一响，且听下回分解。{{ tg_bold_end }}"
+      }
+    },
+    {
+      "key": "strm_generate",
+      "name": "STRM 生成",
+      "parent_type": "library_organize",
+      "template": {
+        "title": "📖 茶馆说书·STRM",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}话说这厢STRM，各位看官听真——{{ tg_italic_end }}\n～ ❖ ～ ❖ ～\n{{ tg_bold_start }}【正文】{{ tg_bold_end }}\n{% if show_name %}❖ 标题曰：{{ show_name }}{% endif %}\n{% if season_episode %}❖ 季集曰：{{ season_episode }}{% endif %}\n{% if file_count %}❖ STRM 数量曰：{{ file_count }}{% endif %}\n{% if strm_root %}❖ 根目录曰：{{ strm_root }}{% endif %}\n{% if episode_count %}❖ 集数曰：{{ episode_count }}{% endif %}\n{{ tg_bold_start }}目录树{{ tg_bold_end }}\n{{ tg_pre_start }}{% for item in strm_tree_items %}{{ item }}\n{% endfor %}{{ tg_pre_end }}\n{{ tg_expandable_quote_start }}书外闲篇（点开）\n{% if strm_path %}❖ STRM 路径曰：{{ strm_path }}{% endif %}{{ tg_expandable_quote_end }}\n～ ❖ ～ ❖ ～\n❖ 开书时辰曰：{{ time_range or now }}\n{{ tg_bold_start }}啪！惊堂木一响，且听下回分解。{{ tg_bold_end }}"
+      }
+    },
+    {
+      "key": "share_receive",
+      "name": "分享转存",
+      "parent_type": "file_transfer",
+      "template": {
+        "title": "📖 茶馆说书·转存",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}话说这厢转存，各位看官听真——{{ tg_italic_end }}\n～ ❖ ～ ❖ ～\n{{ tg_bold_start }}【正文】{{ tg_bold_end }}\n{% if status_text %}❖ 状态曰：{{ status_text }}{% endif %}\n{% if file_name %}❖ 名目曰：{{ file_name }}{% endif %}\n{% if success_count %}❖ 妥当曰：{{ success_count }}{% endif %}\n{% if failed_count %}❖ 岔子曰：{{ failed_count }}{% endif %}\n{% if elapsed %}❖ 工夫曰：{{ elapsed }}{% endif %}\n{% if transfer_source %}❖ 来路曰：{{ transfer_source }}{% endif %}\n{% if target_path %}❖ 落脚处曰：{{ target_path }}{% endif %}\n{{ tg_expandable_quote_start }}书外闲篇（点开）\n{% if error_message %}❖ 错误曰：{{ error_message }}{% endif %}\n{% if operation_type %}❖ 操作曰：{{ operation_type }}{% endif %}{{ tg_expandable_quote_end }}\n～ ❖ ～ ❖ ～\n❖ 开书时辰曰：{{ now }}\n{{ tg_bold_start }}啪！惊堂木一响，且听下回分解。{{ tg_bold_end }}"
+      }
+    },
+    {
+      "key": "offline_download",
+      "name": "离线下载",
+      "parent_type": "file_transfer",
+      "template": {
+        "title": "📖 茶馆说书·离线",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}话说这厢离线，各位看官听真——{{ tg_italic_end }}\n～ ❖ ～ ❖ ～\n{{ tg_bold_start }}【正文】{{ tg_bold_end }}\n{% if status_text %}❖ 状态曰：{{ status_text }}{% endif %}\n{% if file_name %}❖ 名目曰：{{ file_name }}{% endif %}\n{% if success_count %}❖ 妥当曰：{{ success_count }}{% endif %}\n{% if failed_count %}❖ 岔子曰：{{ failed_count }}{% endif %}\n{% if url_count %}❖ 链接数曰：{{ url_count }}{% endif %}\n{% if target_path %}❖ 落脚处曰：{{ target_path }}{% endif %}\n{% if transfer_source %}❖ 来路曰：{{ transfer_source }}{% endif %}\n{% if elapsed %}❖ 工夫曰：{{ elapsed }}{% endif %}\n{{ tg_expandable_quote_start }}书外闲篇（点开）\n{% if error_message %}❖ 错误曰：{{ error_message }}{% endif %}{{ tg_expandable_quote_end }}\n～ ❖ ～ ❖ ～\n❖ 开书时辰曰：{{ now }}\n{{ tg_bold_start }}啪！惊堂木一响，且听下回分解。{{ tg_bold_end }}"
+      }
+    },
+    {
+      "key": "tg_auto_transfer",
+      "name": "TG 自动转存",
+      "parent_type": "file_transfer",
+      "template": {
+        "title": "📖 茶馆说书·TG 转存",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}话说这厢TG 转存，各位看官听真——{{ tg_italic_end }}\n～ ❖ ～ ❖ ～\n{{ tg_bold_start }}【正文】{{ tg_bold_end }}\n{% if status_text %}❖ 状态曰：{{ status_text }}{% endif %}\n{% if source_name %}❖ 频道曰：{{ source_name }}{% endif %}\n{% if file_name %}❖ 名目曰：{{ file_name }}{% endif %}\n{% if success_count %}❖ 妥当曰：{{ success_count }}{% endif %}\n{% if failed_count %}❖ 岔子曰：{{ failed_count }}{% endif %}\n{% if target_path %}❖ 落脚处曰：{{ target_path }}{% endif %}\n{{ tg_expandable_quote_start }}书外闲篇（点开）\n{% if error_message %}❖ 错误曰：{{ error_message }}{% endif %}\n{% if operation_type %}❖ 操作曰：{{ operation_type }}{% endif %}{{ tg_expandable_quote_end }}\n～ ❖ ～ ❖ ～\n❖ 开书时辰曰：{{ now }}\n{{ tg_bold_start }}啪！惊堂木一响，且听下回分解。{{ tg_bold_end }}"
+      }
+    },
+    {
+      "key": "tg_auto_offline",
+      "name": "TG 自动离线",
+      "parent_type": "file_transfer",
+      "template": {
+        "title": "📖 茶馆说书·TG 离线",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}话说这厢TG 离线，各位看官听真——{{ tg_italic_end }}\n～ ❖ ～ ❖ ～\n{{ tg_bold_start }}【正文】{{ tg_bold_end }}\n{% if status_text %}❖ 状态曰：{{ status_text }}{% endif %}\n{% if source_name %}❖ 频道曰：{{ source_name }}{% endif %}\n{% if file_name %}❖ 名目曰：{{ file_name }}{% endif %}\n{% if success_count %}❖ 妥当曰：{{ success_count }}{% endif %}\n{% if failed_count %}❖ 岔子曰：{{ failed_count }}{% endif %}\n{% if url_count %}❖ 链接数曰：{{ url_count }}{% endif %}\n{% if target_path %}❖ 落脚处曰：{{ target_path }}{% endif %}\n{{ tg_expandable_quote_start }}书外闲篇（点开）\n{% if error_message %}❖ 错误曰：{{ error_message }}{% endif %}{{ tg_expandable_quote_end }}\n～ ❖ ～ ❖ ～\n❖ 开书时辰曰：{{ now }}\n{{ tg_bold_start }}啪！惊堂木一响，且听下回分解。{{ tg_bold_end }}"
+      }
+    },
+    {
+      "key": "tg_video_download",
+      "name": "TG 视频下载",
+      "parent_type": "file_transfer",
+      "template": {
+        "title": "📖 茶馆说书·TG 视频",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}话说这厢TG 视频，各位看官听真——{{ tg_italic_end }}\n～ ❖ ～ ❖ ～\n{{ tg_bold_start }}【正文】{{ tg_bold_end }}\n{% if status_text %}❖ 状态曰：{{ status_text }}{% endif %}\n{% if source_name %}❖ 频道曰：{{ source_name }}{% endif %}\n{% if file_name %}❖ 名目曰：{{ file_name }}{% endif %}\n{% if total_size %}❖ 总大小曰：{{ total_size }}{% endif %}\n{% if target_path %}❖ 落脚处曰：{{ target_path }}{% endif %}\n{{ tg_expandable_quote_start }}书外闲篇（点开）\n{% if error_message %}❖ 错误曰：{{ error_message }}{% endif %}{{ tg_expandable_quote_end }}\n～ ❖ ～ ❖ ～\n❖ 开书时辰曰：{{ now }}\n{{ tg_bold_start }}啪！惊堂木一响，且听下回分解。{{ tg_bold_end }}"
+      }
+    },
+    {
+      "key": "account_migration",
+      "name": "多号云迁移",
+      "parent_type": "file_transfer",
+      "template": {
+        "title": "📖 茶馆说书·迁移",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}话说这厢迁移，各位看官听真——{{ tg_italic_end }}\n～ ❖ ～ ❖ ～\n{{ tg_bold_start }}【正文】{{ tg_bold_end }}\n{% if status_text %}❖ 状态曰：{{ status_text }}{% endif %}\n{% if file_name %}❖ 名目曰：{{ file_name }}{% endif %}\n{% if success_count %}❖ 妥当曰：{{ success_count }}{% endif %}\n{% if failed_count %}❖ 岔子曰：{{ failed_count }}{% endif %}\n{% if skipped_count %}❖ 跳过曰：{{ skipped_count }}{% endif %}\n{% if scanned_count %}❖ 扫描曰：{{ scanned_count }}{% endif %}\n{% if total_size %}❖ 总大小曰：{{ total_size }}{% endif %}\n{% if target_path %}❖ 落脚处曰：{{ target_path }}{% endif %}\n{% if elapsed %}❖ 工夫曰：{{ elapsed }}{% endif %}\n{{ tg_expandable_quote_start }}书外闲篇（点开）\n{% if error_message %}❖ 错误曰：{{ error_message }}{% endif %}{{ tg_expandable_quote_end }}\n～ ❖ ～ ❖ ～\n❖ 开书时辰曰：{{ now }}\n{{ tg_bold_start }}啪！惊堂木一响，且听下回分解。{{ tg_bold_end }}"
+      }
+    },
+    {
+      "key": "ed2k_task",
+      "name": "ED2K 任务",
+      "parent_type": "file_transfer",
+      "template": {
+        "title": "📖 茶馆说书·ED2K",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}话说这厢ED2K，各位看官听真——{{ tg_italic_end }}\n～ ❖ ～ ❖ ～\n{{ tg_bold_start }}【正文】{{ tg_bold_end }}\n{% if status_text %}❖ 状态曰：{{ status_text }}{% endif %}\n{% if title %}❖ 标题曰：{{ title }}{% endif %}\n{% if media_type %}❖ 媒体类型曰：{{ media_type }}{% endif %}\n{% if tmdb_id %}❖ TMDB曰：{{ tmdb_id }}{% endif %}\n{% if file_name %}❖ 名目曰：{{ file_name }}{% endif %}\n{% if success_count %}❖ 妥当曰：{{ success_count }}{% endif %}\n{% if failed_count %}❖ 岔子曰：{{ failed_count }}{% endif %}\n{% if file_count %}❖ 文件数曰：{{ file_count }}{% endif %}\n{% if total_size %}❖ 总大小曰：{{ total_size }}{% endif %}\n{% if transfer_source %}❖ 来路曰：{{ transfer_source }}{% endif %}\n{% if elapsed %}❖ 工夫曰：{{ elapsed }}{% endif %}\n{{ tg_expandable_quote_start }}书外闲篇（点开）\n{% if details %}❖ 详情曰：{{ details }}{% endif %}\n{% if error_message %}❖ 错误曰：{{ error_message }}{% endif %}{{ tg_expandable_quote_end }}\n～ ❖ ～ ❖ ～\n❖ 开书时辰曰：{{ now }}\n{{ tg_bold_start }}啪！惊堂木一响，且听下回分解。{{ tg_bold_end }}"
+      }
+    },
+    {
+      "key": "media_auto_share",
+      "name": "媒体自动分享",
+      "parent_type": "file_transfer",
+      "template": {
+        "title": "📖 茶馆说书·分享",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}话说这厢分享，各位看官听真——{{ tg_italic_end }}\n～ ❖ ～ ❖ ～\n{{ tg_bold_start }}【正文】{{ tg_bold_end }}\n{% if title %}❖ 标题曰：{{ title }}{% endif %}\n{% if media_type %}❖ 媒体类型曰：{{ media_type }}{% endif %}\n{% if year %}❖ 年份曰：{{ year }}{% endif %}\n{% if file_count %}❖ 文件数曰：{{ file_count }}{% endif %}\n{% if total_size %}❖ 总大小曰：{{ total_size }}{% endif %}\n{% if quality %}❖ 成色曰：{{ quality }}{% endif %}\n{% if status_text %}❖ 状态曰：{{ status_text }}{% endif %}\n{% if target_path %}❖ 落脚处曰：{{ target_path }}{% endif %}\n{{ tg_expandable_quote_start }}书外闲篇（点开）\n{% if quality_comment %}❖ 画质点评曰：{{ quality_comment }}{% endif %}\n{% if actors %}❖ 演员曰：{{ actors }}{% endif %}\n{% if directors %}❖ 导演曰：{{ directors }}{% endif %}\n{% if details %}❖ 详情曰：{{ details }}{% endif %}\n{% if error_message %}❖ 错误曰：{{ error_message }}{% endif %}\n{% if tmdb_link %}❖ TMDB曰：{{ tmdb_link }}{% endif %}\n{% if imdb_link %}❖ IMDb曰：{{ imdb_link }}{% endif %}{{ tg_expandable_quote_end }}\n～ ❖ ～ ❖ ～\n❖ 开书时辰曰：{{ now }}\n{{ tg_bold_start }}啪！惊堂木一响，且听下回分解。{{ tg_bold_end }}",
+        "quality_comments": {
+          "customized": true,
+          "dolby_vision": "Dolby Vision：这一出光影，真真是极好的。",
+          "hdr": "HDR：明暗有致，层次分明。",
+          "4k": "4K：须眉毕现。",
+          "1080p": "1080P：清清楚楚。"
+        }
+      }
+    },
+    {
+      "key": "account_cookie_invalid",
+      "name": "Cookie 失效",
+      "parent_type": "account_status",
+      "template": {
+        "title": "📖 茶馆说书·Cookie",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}话说这厢Cookie，各位看官听真——{{ tg_italic_end }}\n～ ❖ ～ ❖ ～\n{{ tg_bold_start }}【正文】{{ tg_bold_end }}\n{% if account_name %}❖ 账号曰：{{ account_name }}{% endif %}\n{% if status_message %}❖ 状态曰：{{ status_message }}{% endif %}\n{{ tg_expandable_quote_start }}书外闲篇（点开）\n{% if details %}❖ 详情曰：{{ details }}{% endif %}\n{% if error_message %}❖ 错误曰：{{ error_message }}{% endif %}{{ tg_expandable_quote_end }}\n～ ❖ ～ ❖ ～\n❖ 开书时辰曰：{{ now }}\n{{ tg_bold_start }}啪！惊堂木一响，且听下回分解。{{ tg_bold_end }}"
+      }
+    },
+    {
+      "key": "account_switched",
+      "name": "账号切换",
+      "parent_type": "account_status",
+      "template": {
+        "title": "📖 茶馆说书·切换",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}话说这厢切换，各位看官听真——{{ tg_italic_end }}\n～ ❖ ～ ❖ ～\n{{ tg_bold_start }}【正文】{{ tg_bold_end }}\n{% if account_name %}❖ 账号曰：{{ account_name }}{% endif %}\n{% if status_message %}❖ 状态曰：{{ status_message }}{% endif %}\n{% if operation_type %}❖ 操作曰：{{ operation_type }}{% endif %}\n{{ tg_expandable_quote_start }}书外闲篇（点开）\n{% if details %}❖ 详情曰：{{ details }}{% endif %}{{ tg_expandable_quote_end }}\n～ ❖ ～ ❖ ～\n❖ 开书时辰曰：{{ now }}\n{{ tg_bold_start }}啪！惊堂木一响，且听下回分解。{{ tg_bold_end }}"
+      }
+    },
+    {
+      "key": "account_checkin",
+      "name": "115 签到",
+      "parent_type": "account_status",
+      "template": {
+        "title": "📖 茶馆说书·签到",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}话说这厢签到，各位看官听真——{{ tg_italic_end }}\n～ ❖ ～ ❖ ～\n{{ tg_bold_start }}【正文】{{ tg_bold_end }}\n{% if account_name %}❖ 账号曰：{{ account_name }}{% endif %}\n{% if status_message %}❖ 状态曰：{{ status_message }}{% endif %}\n{% if points %}❖ 本次积分曰：{{ points }}{% endif %}\n{% if total_points %}❖ 总积分曰：{{ total_points }}{% endif %}\n{% if checkin_count %}❖ 累计签到曰：{{ checkin_count }} 次{% if checkin_points %} · {{ checkin_points }} 积分{% endif %}{% endif %}\n{{ tg_expandable_quote_start }}书外闲篇（点开）\n{% if details %}❖ 详情曰：{{ details }}{% endif %}{{ tg_expandable_quote_end }}\n～ ❖ ～ ❖ ～\n❖ 开书时辰曰：{{ now }}\n{{ tg_bold_start }}啪！惊堂木一响，且听下回分解。{{ tg_bold_end }}"
+      }
+    },
+    {
+      "key": "dianying_checkin",
+      "name": "癫影签到",
+      "parent_type": "account_status",
+      "template": {
+        "title": "📖 茶馆说书·癫影签到",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}话说这厢癫影签到，各位看官听真——{{ tg_italic_end }}\n～ ❖ ～ ❖ ～\n{{ tg_bold_start }}【正文】{{ tg_bold_end }}\n{% if account_name %}❖ 账号曰：{{ account_name }}{% endif %}\n{% if status_message %}❖ 状态曰：{{ status_message }}{% endif %}\n{% if points %}❖ 本次积分曰：{{ points }}{% endif %}\n{% if total_points %}❖ 总积分曰：{{ total_points }}{% endif %}\n{% if checkin_count %}❖ 累计签到曰：{{ checkin_count }} 次{% endif %}\n{{ tg_expandable_quote_start }}书外闲篇（点开）\n{% if details %}❖ 详情曰：{{ details }}{% endif %}{{ tg_expandable_quote_end }}\n～ ❖ ～ ❖ ～\n❖ 开书时辰曰：{{ now }}\n{{ tg_bold_start }}啪！惊堂木一响，且听下回分解。{{ tg_bold_end }}"
+      }
+    },
+    {
+      "key": "container_update_check",
+      "name": "容器更新检查",
+      "parent_type": "container_update",
+      "template": {
+        "title": "📖 茶馆说书·更新检查",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}话说这厢更新检查，各位看官听真——{{ tg_italic_end }}\n～ ❖ ～ ❖ ～\n{{ tg_bold_start }}【正文】{{ tg_bold_end }}\n{% if container_count %}❖ 容器总数曰：{{ container_count }}{% endif %}\n{% if available_count %}❖ 可更新曰：{{ available_count }}{% endif %}\n{% if current_count %}❖ 已最新曰：{{ current_count }}{% endif %}\n{% if check_error_count %}❖ 检查失败曰：{{ check_error_count }}{% endif %}\n{{ tg_expandable_quote_start }}书外闲篇（点开）\n{% if details %}❖ 详情曰：{{ details }}{% endif %}{{ tg_expandable_quote_end }}\n～ ❖ ～ ❖ ～\n❖ 开书时辰曰：{{ now }}\n{{ tg_bold_start }}啪！惊堂木一响，且听下回分解。{{ tg_bold_end }}"
+      }
+    },
+    {
+      "key": "container_update_result",
+      "name": "容器更新结果",
+      "parent_type": "container_update",
+      "template": {
+        "title": "📖 茶馆说书·更新结果",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}话说这厢更新结果，各位看官听真——{{ tg_italic_end }}\n～ ❖ ～ ❖ ～\n{{ tg_bold_start }}【正文】{{ tg_bold_end }}\n{% if trigger %}❖ 触发方式曰：{{ trigger }}{% endif %}\n{% if container_count %}❖ 容器总数曰：{{ container_count }}{% endif %}\n{% if success_count %}❖ 妥当曰：{{ success_count }}{% endif %}\n{% if failed_count %}❖ 岔子曰：{{ failed_count }}{% endif %}\n{{ tg_expandable_quote_start }}书外闲篇（点开）\n{% if details %}❖ 详情曰：{{ details }}{% endif %}{{ tg_expandable_quote_end }}\n～ ❖ ～ ❖ ～\n❖ 开书时辰曰：{{ now }}\n{{ tg_bold_start }}啪！惊堂木一响，且听下回分解。{{ tg_bold_end }}"
+      }
+    },
+    {
+      "key": "container_update_test",
+      "name": "容器通知测试",
+      "parent_type": "container_update",
+      "template": {
+        "title": "📖 茶馆说书·通知测试",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}话说这厢通知测试，各位看官听真——{{ tg_italic_end }}\n～ ❖ ～ ❖ ～\n{{ tg_bold_start }}【正文】{{ tg_bold_end }}\n❖ 测试消息曰：{{ test_message or '容器更新消息推送通道工作正常' }}\n～ ❖ ～ ❖ ～\n❖ 开书时辰曰：{{ now }}\n{{ tg_bold_start }}啪！惊堂木一响，且听下回分解。{{ tg_bold_end }}"
+      }
+    },
+    {
+      "key": "dian115_self_update",
+      "name": "Dian115 自更新",
+      "parent_type": "container_update",
+      "template": {
+        "title": "📖 茶馆说书·自更新",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}话说这厢自更新，各位看官听真——{{ tg_italic_end }}\n～ ❖ ～ ❖ ～\n{{ tg_bold_start }}【正文】{{ tg_bold_end }}\n❖ 状态曰：{% if update_success %}✅ 更新成功{% else %}❌ 更新失败{% endif %}\n{% if current_version %}❖ 当前版本曰：{{ current_version }}{% endif %}\n{% if build_channel %}❖ 构建通道曰：{{ build_channel }}{% if build_commit %} · {{ build_commit }}{% endif %}{% endif %}\n{{ tg_expandable_quote_start }}书外闲篇（点开）\n{% if error_message %}❖ 错误曰：{{ error_message }}{% endif %}\n{% if details %}❖ 详情曰：{{ details }}{% endif %}{{ tg_expandable_quote_end }}\n～ ❖ ～ ❖ ～\n❖ 开书时辰曰：{{ now }}\n{{ tg_bold_start }}啪！惊堂木一响，且听下回分解。{{ tg_bold_end }}"
+      }
+    },
+    {
+      "key": "proxy_health_daily_report",
+      "name": "Clash 监控日报",
+      "parent_type": "proxy_health",
+      "template": {
+        "title": "📖 茶馆说书·监控日报",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}话说这厢监控日报，各位看官听真——{{ tg_italic_end }}\n～ ❖ ～ ❖ ～\n{{ tg_bold_start }}【正文】{{ tg_bold_end }}\n{% if day %}❖ 日期曰：{{ day }}{% endif %}\n{% if request_count %}❖ 请求数曰：{{ request_count }}{% endif %}\n{% if failure_count %}❖ 岔子曰：{{ failure_count }}{% endif %}\n{% if success_rate %}❖ 成功率曰：{{ success_rate }}{% endif %}\n{% if switch_count %}❖ 切换次数曰：{{ switch_count }} 次{% if auto_switch_count or manual_switch_count %}（自动 {{ auto_switch_count }} / 手动 {{ manual_switch_count }}）{% endif %}{% endif %}\n{% if upload_size %}❖ 上传曰：{{ upload_size }}{% endif %}\n{% if download_size %}❖ 下载曰：{{ download_size }}{% endif %}\n{% if total_traffic_size %}❖ 总流量曰：{{ total_traffic_size }}{% endif %}\n～ ❖ ～ ❖ ～\n❖ 开书时辰曰：{{ now }}\n{{ tg_bold_start }}啪！惊堂木一响，且听下回分解。{{ tg_bold_end }}"
+      }
+    },
+    {
+      "key": "proxy_health_test_report",
+      "name": "Clash 测试报告",
+      "parent_type": "proxy_health",
+      "template": {
+        "title": "📖 茶馆说书·通道测试",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}话说这厢通道测试，各位看官听真——{{ tg_italic_end }}\n～ ❖ ～ ❖ ～\n{{ tg_bold_start }}【正文】{{ tg_bold_end }}\n{% if day %}❖ 日期曰：{{ day }}{% endif %}\n{% if request_count %}❖ 请求数曰：{{ request_count }}{% endif %}\n{% if failure_count %}❖ 岔子曰：{{ failure_count }}{% endif %}\n{% if success_rate %}❖ 成功率曰：{{ success_rate }}{% endif %}\n{% if switch_count %}❖ 切换次数曰：{{ switch_count }} 次{% if auto_switch_count or manual_switch_count %}（自动 {{ auto_switch_count }} / 手动 {{ manual_switch_count }}）{% endif %}{% endif %}\n{% if upload_size %}❖ 上传曰：{{ upload_size }}{% endif %}\n{% if download_size %}❖ 下载曰：{{ download_size }}{% endif %}\n{% if total_traffic_size %}❖ 总流量曰：{{ total_traffic_size }}{% endif %}\n～ ❖ ～ ❖ ～\n❖ 开书时辰曰：{{ now }}\n{{ tg_bold_start }}啪！惊堂木一响，且听下回分解。{{ tg_bold_end }}"
+      }
+    },
+    {
+      "key": "daily_statistics_report",
+      "name": "每日运行统计",
+      "parent_type": "statistics_report",
+      "template": {
+        "title": "📖 茶馆说书·运行统计",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}话说这厢运行统计，各位看官听真——{{ tg_italic_end }}\n～ ❖ ～ ❖ ～\n{{ tg_bold_start }}【正文】{{ tg_bold_end }}\n{% if report_date %}❖ 报告日期曰：{{ report_date }}{% endif %}\n{% if period_label %}❖ 统计周期曰：{{ period_label }}{% endif %}\n{% if organized_count %}❖ 今日整理曰：{{ organized_count }}{% endif %}\n{% if new_count %}❖ 今日新增曰：{{ new_count }}{% endif %}\n{% if all_files %}❖ 全部文件曰：{{ all_files }}{% endif %}\n{% if emby_media_total %}❖ 媒体总数曰：{{ emby_media_total }}{% endif %}\n{% if wash_count %}❖ 今日洗版曰：{{ wash_count }}{% endif %}\n{% if transfer_count %}❖ 今日转存曰：{{ transfer_count }}{% endif %}\n{% if offline_count %}❖ 今日离线曰：{{ offline_count }}{% endif %}\n{{ tg_bold_start }}最新整理{{ tg_bold_end }}\n{% for item in latest_media %}❖ {{ loop.index }}. {{ item.title }}{% if item.type_year %} · {{ item.type_year }}{% endif %}{% if item.episode %} · {{ item.episode }}{% endif %}\n{% endfor %}\n{{ tg_expandable_quote_start }}书外闲篇（点开）\n{% if signature %}❖ 签名曰：{{ signature }}{% endif %}{{ tg_expandable_quote_end }}\n～ ❖ ～ ❖ ～\n❖ 开书时辰曰：{{ generated_at or now }}\n{{ tg_bold_start }}啪！惊堂木一响，且听下回分解。{{ tg_bold_end }}"
+      }
+    },
+    {
+      "key": "emby_library_statistics_report",
+      "name": "Emby 媒体库统计",
+      "parent_type": "statistics_report",
+      "template": {
+        "title": "📖 茶馆说书·库统计",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}话说这厢库统计，各位看官听真——{{ tg_italic_end }}\n～ ❖ ～ ❖ ～\n{{ tg_bold_start }}【正文】{{ tg_bold_end }}\n{% if library_name %}❖ 媒体库曰：{{ library_name }}{% endif %}\n{% if report_date %}❖ 报告日期曰：{{ report_date }}{% endif %}\n{% if period_label %}❖ 统计周期曰：{{ period_label }}{% endif %}\n{% if media_total %}❖ 媒体总数曰：{{ media_total }}{% endif %}\n{% if movie_count %}❖ 电影曰：{{ movie_count }}{% endif %}\n{% if series_count %}❖ 剧集曰：{{ series_count }}{% endif %}\n{% if season_count %}❖ 季曰：{{ season_count }}{% endif %}\n{% if episode_count %}❖ 集曰：{{ episode_count }}{% endif %}\n{% if all_files %}❖ 全部文件曰：{{ all_files }}{% endif %}\n{{ tg_bold_start }}最近入库{{ tg_bold_end }}\n{% for item in recent_media %}❖ {{ loop.index }}. {{ item.title }}{% if item.type_year %} · {{ item.type_year }}{% endif %}{% if item.episode %} · {{ item.episode }}{% endif %}\n{% endfor %}\n{{ tg_expandable_quote_start }}书外闲篇（点开）\n{% if signature %}❖ 签名曰：{{ signature }}{% endif %}{{ tg_expandable_quote_end }}\n～ ❖ ～ ❖ ～\n❖ 开书时辰曰：{{ generated_at or now }}\n{{ tg_bold_start }}啪！惊堂木一响，且听下回分解。{{ tg_bold_end }}"
+      }
+    },
+    {
+      "key": "subscribe_added",
+      "name": "添加订阅",
+      "parent_type": "subscribe",
+      "template": {
+        "title": "📖 茶馆说书·订阅添加",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}话说这厢订阅添加，各位看官听真——{{ tg_italic_end }}\n～ ❖ ～ ❖ ～\n{{ tg_bold_start }}【正文】{{ tg_bold_end }}\n{% if title_year %}❖ 标题曰：{{ title_year }}{% endif %}\n{% if season_episode %}❖ 季集曰：{{ season_episode }}{% endif %}\n{% if media_type %}❖ 媒体类型曰：{{ media_type }}{% endif %}\n{% if needed_episodes %}❖ 待补曰：{{ needed_episodes }}{% endif %}\n{% if channel %}❖ 渠道曰：{{ channel }}{% endif %}\n{% if rating %}❖ 叫座曰：{{ rating }}{% endif %}\n{{ tg_expandable_quote_start }}书外闲篇（点开）\n{% if genres %}❖ 行当曰：{{ genres }}{% endif %}\n{% if actors %}❖ 演员曰：{{ actors }}{% endif %}\n{% if directors %}❖ 导演曰：{{ directors }}{% endif %}\n{% if overview %}❖ 段子大意曰：{{ overview }}{% endif %}\n{% if tmdb_link %}❖ TMDB曰：{{ tmdb_link }}{% endif %}\n{% if imdb_link %}❖ IMDb曰：{{ imdb_link }}{% endif %}{{ tg_expandable_quote_end }}\n～ ❖ ～ ❖ ～\n❖ 开书时辰曰：{{ now }}\n{{ tg_bold_start }}啪！惊堂木一响，且听下回分解。{{ tg_bold_end }}"
+      }
+    },
+    {
+      "key": "subscribe_landed",
+      "name": "订阅完成",
+      "parent_type": "subscribe",
+      "template": {
+        "title": "📖 茶馆说书·订阅完成",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}话说这厢订阅完成，各位看官听真——{{ tg_italic_end }}\n～ ❖ ～ ❖ ～\n{{ tg_bold_start }}【正文】{{ tg_bold_end }}\n{% if title_year %}❖ 标题曰：{{ title_year }}{% endif %}\n{% if season_episode %}❖ 季集曰：{{ season_episode }}{% endif %}\n{% if landed_via %}❖ 入库来源曰：{{ landed_via }}{% if landed_tag %} · {{ landed_tag }}{% endif %}{% endif %}\n{% if rating %}❖ 叫座曰：{{ rating }}{% endif %}\n{{ tg_expandable_quote_start }}书外闲篇（点开）\n{% if genres %}❖ 行当曰：{{ genres }}{% endif %}\n{% if actors %}❖ 演员曰：{{ actors }}{% endif %}\n{% if directors %}❖ 导演曰：{{ directors }}{% endif %}\n{% if overview %}❖ 段子大意曰：{{ overview }}{% endif %}\n{% if tmdb_link %}❖ TMDB曰：{{ tmdb_link }}{% endif %}\n{% if imdb_link %}❖ IMDb曰：{{ imdb_link }}{% endif %}{{ tg_expandable_quote_end }}\n～ ❖ ～ ❖ ～\n❖ 开书时辰曰：{{ now }}\n{{ tg_bold_start }}啪！惊堂木一响，且听下回分解。{{ tg_bold_end }}"
+      }
+    },
+    {
+      "key": "subscribe_partial",
+      "name": "订阅部分完成",
+      "parent_type": "subscribe",
+      "template": {
+        "title": "📖 茶馆说书·订阅进展",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}话说这厢订阅进展，各位看官听真——{{ tg_italic_end }}\n～ ❖ ～ ❖ ～\n{{ tg_bold_start }}【正文】{{ tg_bold_end }}\n{% if title_year %}❖ 标题曰：{{ title_year }}{% endif %}\n{% if season_episode %}❖ 季集曰：{{ season_episode }}{% endif %}\n{% if covered_episodes %}❖ 已覆盖曰：{{ covered_episodes }}{% endif %}\n{% if needed_episodes %}❖ 待补曰：{{ needed_episodes }}{% endif %}\n{% if landed_via %}❖ 入库来源曰：{{ landed_via }}{% if landed_tag %} · {{ landed_tag }}{% endif %}{% endif %}\n{{ tg_expandable_quote_start }}书外闲篇（点开）\n{% if genres %}❖ 行当曰：{{ genres }}{% endif %}\n{% if actors %}❖ 演员曰：{{ actors }}{% endif %}\n{% if directors %}❖ 导演曰：{{ directors }}{% endif %}\n{% if overview %}❖ 段子大意曰：{{ overview }}{% endif %}\n{% if tmdb_link %}❖ TMDB曰：{{ tmdb_link }}{% endif %}\n{% if imdb_link %}❖ IMDb曰：{{ imdb_link }}{% endif %}{{ tg_expandable_quote_end }}\n～ ❖ ～ ❖ ～\n❖ 开书时辰曰：{{ now }}\n{{ tg_bold_start }}啪！惊堂木一响，且听下回分解。{{ tg_bold_end }}"
+      }
+    },
+    {
+      "key": "plugin_notification_message",
+      "name": "插件任务结果",
+      "parent_type": "plugin_notification",
+      "template": {
+        "title": "📖 茶馆说书·插件",
+        "customized": true,
+        "render_mode": "classic_html",
+        "image_mode": "auto",
+        "text": "{{ tg_italic_start }}话说这厢插件，各位看官听真——{{ tg_italic_end }}\n～ ❖ ～ ❖ ～\n{{ tg_bold_start }}【正文】{{ tg_bold_end }}\n❖ 级别曰：{{ level_icon }} {{ level_text }}\n{% if plugin_name %}❖ 插件曰：{{ plugin_name }}{% endif %}\n{% if plugin_title %}❖ 标题曰：{{ plugin_title }}{% endif %}\n{% if plugin_body %}❖ 消息曰：{{ plugin_body }}{% endif %}\n{% if job_ref %}❖ 任务编号曰：{{ job_ref }}{% endif %}\n～ ❖ ～ ❖ ～\n❖ 开书时辰曰：{{ now }}\n{{ tg_bold_start }}啪！惊堂木一响，且听下回分解。{{ tg_bold_end }}"
+      }
+    }
+  ]
+}

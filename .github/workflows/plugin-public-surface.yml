@@ -1,0 +1,54 @@
+name: Plugin public surface guard
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  public-surface:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout public tree
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Reject main-project source and release material
+        run: node docs/plugin-platform/conformance/verify-public-surface.mjs
+      - name: Validate public OpenAPI contract
+        run: node docs/plugin-platform/conformance/openapi-check.mjs
+
+  plugin-example:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: docs/plugin-platform/examples/complete-plugin
+    steps:
+      - name: Checkout public tree
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: docs/plugin-platform/examples/complete-plugin/package-lock.json
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22.x'
+      - name: Install example dependencies
+        run: npm ci
+      - name: Build Vue UI and Linux runtime
+        run: npm run build
+      - name: Validate manifest, market template, UI and runtime
+        run: npm run check
+      - name: Run public process-protocol smoke test
+        run: node ../../conformance/runtime-smoke.mjs --runtime build/runtime/plugin --manifest manifest.template.json --exercise-manifest --action send-test --expect-host-call --expect-telegram
+      - name: Build and sign a disposable package
+        run: npm run package -- --generate-key
+      - name: Validate generated market entry
+        run: node ../../conformance/project-check.mjs --manifest manifest.template.json --market releases/market-entry.generated.json --build-root build --require-build

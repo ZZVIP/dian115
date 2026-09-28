@@ -1,6 +1,6 @@
 # DIAN115 Host Call v2
 
-`host.call` 是 process 插件唯一的网络与宿主业务入口。它同时承载：
+`host.call` 是 WASM 和兼容 process 插件的网络与宿主业务入口。WASM 使用 `dian115.host_call` / `host_read` 导入承载下述业务请求，外层封装见 [WASM 协议](wasm-runtime-v1.md)。它同时承载：
 
 - 安装时批准的 DIAN115 本地 Host API；
 - 任意 HTTP/HTTPS 网站或本地服务请求。
@@ -18,7 +18,7 @@
   "method": "host.call",
   "params": {
     "method": "GET",
-    "path": "/api/tmdb/search?query=Dune",
+    "path": "/api/tmdb/search?q=Dune&page=1",
     "headers": {"accept": "application/json"},
     "body_base64": ""
   }
@@ -49,7 +49,7 @@
 | `body_base64` | 否 | 标准 Base64；请求接受 padded/unpadded，响应固定 unpadded |
 | `credential_ref` | 否 | 外部 HTTP/HTTPS 可用的安装实例托管凭据引用；使用 HTTP 时秘密会以明文传输 |
 
-JSON 解码器拒绝未知字段和尾随 JSON。单个 Host Call 参数帧、请求正文和返回正文都受 256 KiB process 通道限制。
+JSON 解码器拒绝未知字段和尾随 JSON。JSON-RPC 帧上限为 16 MiB；解码后的 Host Call 请求正文和返回正文上限均为 8 MiB。该上限只防止异常插件耗尽主容器内存，不再把正常数据限制在 256 KiB；列表接口仍应使用各自的分页参数。
 
 以下情况返回 JSON-RPC `-32001`：参数无效、路径歧义、本地 API 未批准、凭据引用无效或宿主无法调度调用。错误消息已经脱敏，不应按自由文本分支业务逻辑。
 
@@ -118,7 +118,58 @@ GET /api/plugin-center/v1/host-apis
 }
 ```
 
-以 `code` 和 `retryable` 为程序判断依据。复用主项目 Handler 的接口可能返回该 Handler 原有 JSON 错误结构；应以对应 OpenAPI operation 为准。
+以 `code` 和 `retryable` 为程序判断依据。各接口的请求、成功响应和错误结构以对应 OpenAPI operation 为准；公开契约不要求开发者读取任何宿主实现源码。
+
+### 2.3 读取宿主 Emby 数据
+
+插件后端需要读取媒体库时，声明并调用专用的只读接口，不要自行索要 Emby 地址或 API Key：
+
+```json
+{
+  "apis": [
+    {"method":"GET","path":"/api/plugin-host/emby/instances","reason":"列出用户可选择的 Emby 实例"},
+    {"method":"GET","path":"/api/plugin-host/emby/libraries","reason":"读取媒体库选项"},
+    {"method":"GET","path":"/api/plugin-host/emby/items","reason":"搜索媒体库内容"},
+    {"method":"GET","path":"/api/plugin-host/emby/items/:id","reason":"读取选中媒体详情"}
+  ]
+}
+```
+
+可声明的 Emby Host API 恰好为：
+
+```text
+GET /api/plugin-host/emby/instances
+GET /api/plugin-host/emby/stats
+GET /api/plugin-host/emby/libraries
+GET /api/plugin-host/emby/items
+GET /api/plugin-host/emby/items/:id
+```
+
+先读取实例：
+
+```json
+{"method":"GET","path":"/api/plugin-host/emby/instances"}
+```
+
+响应正文示例：
+
+```json
+{"items":[{"id":2,"name":"家庭媒体库","is_default":true,"api_key_configured":true}]}
+```
+
+将选中的正整数 `id` 作为其他接口的 `proxy_id`：
+
+```json
+{"method":"GET","path":"/api/plugin-host/emby/libraries?proxy_id=2"}
+```
+
+```json
+{"method":"GET","path":"/api/plugin-host/emby/items?proxy_id=2&library_id=library-1&type=Movie&q=Dune&limit=20&offset=0&sort_by=date_created&sort_order=desc"}
+```
+
+若宿主只有一个可用实例或已经设置有效默认实例，可以省略 `proxy_id`。旧版单实例配置在实例列表中使用 `id: 0`；此时不要传 `proxy_id=0`，直接省略参数。存在多个实例且没有有效默认实例时，省略参数会返回 `409`；不存在、禁用或格式错误的显式 `proxy_id` 返回 `400`，宿主不会静默改用另一个实例。
+
+宿主使用自己保存的地址和 API Key 发起请求。插件只能获得 OpenAPI 列出的安全字段；地址、API Key、媒体路径、`MediaSources`、用户播放数据、用户身份、会话、设备和日志不会返回，也没有 Emby 写接口。统计接口中的 `user_count` 和 `playing_count` 只是数量。媒体列表一次最多 50 条，应按 `offset + limit` 分页，直到已读取数量达到 `total`。
 
 ## 3. 外部 HTTP/HTTPS 与本地服务
 
@@ -145,7 +196,7 @@ GET /api/plugin-center/v1/host-apis
 - 默认总超时 10 秒；process `host.call` 不提供自定义超时字段；
 - 最多跟随 3 次跳转，每次重新校验 URL、DNS、目标地址和代理规则；跳转仍只能到 HTTP/HTTPS；
 - `301/302` 的 POST 和 `303` 会转为 GET 并丢弃 body；
-- 响应正文最多 256 KiB；超出的部分被截断后返回；
+- 响应正文最多 8 MiB；极端超大响应会在 8 MiB 处截断并返回 `x-dian115-body-truncated: true`，常规列表应使用上游分页参数；
 - 查询与 fragment 不会写入审计日志，审计记录 origin、方法、状态、耗时和代理范围。
 
 外部请求 header 名必须是小写合法 HTTP token，最多 64 个；单值最长 8192 字节且不能包含 CR/LF。禁止这些请求头：
@@ -292,3 +343,110 @@ lowercase_hex(SHA256(body))
 文件 Host API 会对输入和输出路径做额外过滤。禁止访问 `/config` 和 Linux 系统路径，包括 `/app`、`/bin`、`/boot`、`/dev`、`/etc`、`/home`、`/lib*`、`/proc`、`/root`、`/run`、`/sbin`、`/srv`、`/sys`、`/tmp`、`/usr`、`/var` 等。合法媒体挂载通常位于 `/data`、`/media`、`/mnt` 或配置的 CD2 挂载前缀，但是否可用仍由宿主文件管理器配置决定。
 
 路径保护同时应用于请求路径、规范化路径、符号链接解析结果、返回数据和已保存目录监控源。错误不会向插件暴露真实受保护路径。
+
+## 8. 指定实例和集数的订阅流程
+
+1. 读取 `/api/plugin-host/emby/instances`，让用户选择已配置凭据的实例；可将选择保存到本插件 Host Storage，不修改宿主默认。实例被停用、删除或移除凭据时要求重新选择，不能悄悄换库。
+2. 使用 `/api/tmdb/search?q=...` 确认 TV 候选，再读取 `/api/tmdb/tv/:id` 的 `seasons`。不能用同名电影或搜索第一项直接创建订阅。第 0 季为特别篇，总集数未知时应提示用户。
+3. 调用 `GET /api/plugin-host/emby/episodes?proxy_id=7&tmdb_id=123&season=2&total_episodes=8`。返回实例、TMDB、季、修正后总集数、`covered_episodes`、`needed_episodes` 和 `complete`。该接口严格匹配 TMDB 与季并读取所选实例；上游失败或分页不完整返回错误，不能显示为“全部缺失”。legacy 实例 ID 为 0 时省略 `proxy_id`。
+4. 确认后创建 `POST /api/subscribe/pool/intents`，传同一 `proxy_id`、`tmdb_id`、`media_type: "tv"`、`season`、`total_episodes`。自动追更使用 `episode_scope_mode: "follow"`；固定范围使用 `episode_scope_mode: "fixed"` 和 `initial_needed_episodes: "1-3,5"`。集数可以包含已公布但尚未播出的集，范围仍需在有效总集数内。普通插件请求不传 `library_snapshot_provided`，不需要 `library_id`。
+5. 宿主在创建前再次读取覆盖并从固定目标扣除已有集，然后才允许搜索排队。例如目标 `1-3`、已有 `1,3`，实际只补 `2`；空范围、非法范围或全部已有不会创建新记录。自动模式沿用宿主的补缺/洗版规则。未指定资源源时沿用宿主配置，仍受宿主订阅开关、资源源与授权条件限制。
+6. 只在收到 `code: "ok"` 和正数 `data.id` 后显示创建成功。保存该 ID，取消时调用对应 DELETE 并等待确认；网络超时不能当作未创建，必须查询宿主记录再决定是否重试。每次新的用户操作使用新幂等键，同一次重试保留原键。
+
+缺集能力必须以运行宿主的 API 目录为准。旧宿主没有 `/api/plugin-host/emby/episodes` 时应提示升级，不能退化为跳过媒体库核对。排期可使用 TV 详情的 `next_episode_to_air`；缺少该字段表示没有已公布的下一集信息。
+
+## 9. 扩展访问模式（host_access）
+
+标准模式下插件只能调用 `x-dian115-host-apis.entries` 发布的 Host API 目录。需要更深集成的插件可以在 Manifest 中声明：
+
+```json
+{
+  "permissions": {
+    "host_access": "extended",
+    "apis": [
+      {"method":"GET","path":"/api/organize/rules","reason":"读取宿主整理规则"}
+    ]
+  }
+}
+```
+
+`extended` 模式下插件可以调用除下列受保护前缀之外的任何 `/api` 路由，不要求逐条出现在目录中：
+
+```text
+/api/auth/            认证与 2FA
+/api/115/cookie、login、qrcode、captcha、check-*、backup-accounts、backup/qrcode
+/api/accounts/115     115 账号与 Cookie 管理
+/api/settings         宿主安全设置
+/api/system/、/api/debug/、/api/guard、/api/self-update
+/api/plugin-center/   插件管理本身
+/api/emby-control/system/、/api/emby-manager/、/api/emby-proxies
+/api/plugins/tg-private-bot、/api/plugins/tg-group-bot
+/api/portal、/api/user-portal、/api/logs
+```
+
+边界说明：
+
+- `extended` 在安装确认对话框中作为高风险权限单独展示，管理员明确同意后生效；
+- 扩展调用的 JSON 响应会经过通用密钥字段与 URL 凭据脱敏；非 JSON 响应原样返回；
+- 写方法仍需 `Idempotency-Key`，审计、路径保护、代理规则和大小上限与目录接口一致；
+- `permissions.apis` 在扩展模式下仍然建议逐条声明，作为安装时的用途披露。
+
+## 10. 可选接口声明与运行时自省
+
+声明 `"optional": true` 的接口在宿主不提供时不再导致安装失败；宿主把它记录到安装记录的 `unavailable_apis`，调用时返回 `host API was not approved` 错误。插件可以用运行时自省代替试错：
+
+```json
+{"method":"host.capabilities"}
+```
+
+返回当前宿主版本、Plugin API 版本、访问级别、完整 Host API 目录以及本安装实例已批准和不可用的接口清单：
+
+```json
+{
+  "host_version": "3.9.0",
+  "plugin_api": "2.0.0",
+  "host_access": "standard",
+  "apis": [{"method":"GET","path":"/api/tmdb/search","category":"tmdb"}],
+  "granted_apis": [{"method":"GET","path":"/api/tmdb/search"}],
+  "unavailable_apis": []
+}
+```
+
+插件应按 `granted_apis` 与目录分支功能，而不是按宿主版本号猜测。宿主版本超出 Manifest `compatibility.dian115` 范围时，运行时会以 `plugin_incompatible` 暂停插件并提示升级，而不是继续运行到崩溃。
+
+## 11. 文件、115 传输与任务 Broker
+
+`/api/plugin-host/` 下的 broker 接口把原来只有外部 `/plugin-api/v1` 通道可用的能力开放给 host.call。所有资源引用（`entry_ref`、`preview_ref`、`job_ref` 等）都是安装实例作用域内的不透明标识，跨插件不可复用。
+
+文件 Broker：
+
+- `GET /api/plugin-host/files/roots`、`GET /files/entries`、`GET /files/entries/:entry_ref`：浏览宿主向插件开放的本地与 CD2/AURA 挂载根目录。
+- `GET /files/entries/:entry_ref/content`：读取文件内容。支持 `Range: bytes=start-end` 分页，单页最大 4MiB，循环分页即可读取任意大小的完整文件；CD2/AURA 挂载文件经宿主挂载点流式读取，插件无需接触云盘凭据或 gRPC 连接。
+- `PUT /files/entries/:entry_ref/content`：以 `{data_base64, offset, truncate}` 按偏移写入本地文件，单次最大 4MiB；可选 `If-Match` 乐观锁。仅纯本地根目录可写，CD2/AURA 挂载与 115 云端条目不提供内容写入。
+- `PATCH /files/entries/:entry_ref`（改名）、`POST /files/directories`（建目录）、`POST /files/operations`（异步复制/移动，返回 `job_ref`）。
+- `POST /files/downloads`：以 `{url, parent_ref, name?}` 把远程文件流式下载到指定本地可写目录，单个任务上限 8GiB，异步执行并返回 `job_ref`。下载目标明确排除 CD2/AURA 挂载目录与 115 云端。
+
+115 传输 Broker：`GET /api/plugin-host/accounts/115`、`POST /accounts/115/selections` 创建账号选择引用；`GET/POST /transfers/115/targets`、`POST /transfers/115/share-previews`、`GET /transfers/115/share-previews/:preview_ref/items`、`POST /transfers/115/share-receives`、`POST /transfers/115/offline-downloads`、`GET /transfers/115/offline-tasks`、`GET /transfers/115/offline-quota`。账号 Cookie 始终留在宿主，插件只持有不透明引用。
+
+任务查询：`GET /api/plugin-host/jobs/:job_ref` 查询状态与结果，`POST /api/plugin-host/jobs/:job_ref/cancel` 取消。
+
+声明这些接口后宿主自动推导所需的 `files.local.*`、`files.cloud.*`、`transfer.115.*`、`accounts.115.use` 运行能力；broker 写操作自带幂等生命周期，重试同一 `Idempotency-Key` 不会重复执行。
+
+## 12. Telegram 回调按钮
+
+通知和回复按钮除 `url` 外还支持 `callback_data`（二选一，最长 32 字节，不含控制字符）：
+
+```json
+{"buttons": [[{"text": "重试", "callback_data": "retry:job9"}]]}
+```
+
+用户点击按钮后，宿主向该按钮所属的插件安装实例投递 `telegram.callback` 事件（需在 manifest `events` 中声明并具备 `events.subscribe` 能力）：
+
+```json
+{
+  "callback": {"data": "retry:job9"},
+  "message": {"message_id": 123, "chat_id": 456, "chat_type": "private", "user_id": 789, "date": 1759000000}
+}
+```
+
+插件返回 `{handled, answer, alert, reply}`：`answer`（≤200 字符）作为按钮提示 toast，`alert` 控制是否弹窗，`reply` 与 `telegram.message` 的回复格式相同（文本/HTML、HTTPS 图片、按钮，按钮同样支持 `callback_data`）。空响应视为静默确认。每次点击有独立的 Telegram 回调 ID，宿主按它做幂等去重，重试不会重复执行插件逻辑。

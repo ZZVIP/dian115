@@ -10,9 +10,19 @@
 </p>
 
 <p align="center">
+  <a href="https://madbrolab.github.io/dian115/demo/#/overview"><strong>▶ 在线演示</strong></a>
+  ·
   <a href="https://madbrolab.github.io/dian115/">完整 Wiki</a>
   ·
   <a href="https://t.me/dian115group">Telegram 群组</a>
+  ·
+  <a href="docs/plugin-platform/README.md"><code>插件开发</code></a>
+</p>
+
+<p align="center">
+  <a href="https://madbrolab.github.io/dian115/demo/#/overview">
+    <img src="https://img.shields.io/badge/在线演示-立即体验-2563EB?style=for-the-badge&logo=googlechrome&logoColor=white" alt="打开 DIAN-115 在线演示" />
+  </a>
 </p>
 
 <p align="center">
@@ -24,40 +34,55 @@
 
 > DIAN-115 是私有授权项目。普通用户使用发布镜像部署即可，README 不提供源码构建指引。
 
-## 完整 Wiki
 
-项目的完整使用说明已经发布到 GitHub Pages：
 
-[https://madbrolab.github.io/dian115/](https://madbrolab.github.io/dian115/)
+
+## 插件开发与源码发布边界
+
+第三方插件开发只依赖 [`docs/plugin-platform/`](docs/plugin-platform/README.md) 中的公开协议、Schema、OpenAPI、Vue Federation UI 契约、完整示例和黑盒联调工具。
 
 
 ## 项目截图
 
-![DIAN-115 仪表板](screenshots/dashboard.png)
+![DIAN-115 功能总览](screenshots/from.png)
 
 <p align="center">
+  <img src="screenshots/overview.png" alt="总览" width="49%" />
   <img src="screenshots/discovery.png" alt="探索发现" width="49%" />
-  <img src="screenshots/subscriptions.png" alt="媒体订阅" width="49%" />
 </p>
 
 <p align="center">
+  <img src="screenshots/media-subscription.png" alt="媒体订阅" width="49%" />
   <img src="screenshots/organize.png" alt="媒体整理" width="49%" />
+</p>
+
+<p align="center">
+  <img src="screenshots/virtual-library.png" alt="虚拟影库" width="49%" />
   <img src="screenshots/media.png" alt="我的媒体" width="49%" />
 </p>
 
 <p align="center">
   <img src="screenshots/files.png" alt="文件管理" width="49%" />
+  <img src="screenshots/downloads.png" alt="下载管理" width="49%" />
+</p>
+
+<p align="center">
   <img src="screenshots/accounts.png" alt="账号配置" width="49%" />
+  <img src="screenshots/pt-sites.png" alt="站点配置" width="49%" />
 </p>
 
 <p align="center">
-  <img src="screenshots/pt-sites.png" alt="PT 站点" width="49%" />
   <img src="screenshots/plugins.png" alt="插件中心" width="49%" />
+  <img src="screenshots/task-queue.png" alt="任务队列" width="49%" />
 </p>
 
 <p align="center">
-  <img src="screenshots/satellite.png" alt="卫星任务" width="49%" />
   <img src="screenshots/container-update.png" alt="容器更新" width="49%" />
+  <img src="screenshots/cache-center.png" alt="全局缓存" width="49%" />
+</p>
+
+<p align="center">
+  <img src="screenshots/system-settings.png" alt="系统设置" width="49%" />
 </p>
 
 ## DIAN-115 能做什么
