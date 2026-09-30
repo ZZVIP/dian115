@@ -240,17 +240,6 @@ el('clear').addEventListener('click', async () => {
 
 el('open-options').addEventListener('click', () => chrome.runtime.openOptionsPage())
 
-el('copy-id').addEventListener('click', async (event) => {
-  event.preventDefault()
-  const value = 'chrome-extension://' + runtimeId
-  try {
-    await navigator.clipboard.writeText(value)
-    toast('已复制：' + value)
-  } catch {
-    toast(value)
-  }
-})
-
 el('mode').addEventListener('change', async () => {
   await chrome.storage.local.get('settings').then((stored) => {
     const settings = { ...(stored.settings || {}), mode: el('mode').value }

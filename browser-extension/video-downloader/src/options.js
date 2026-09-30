@@ -136,18 +136,6 @@ el('test').addEventListener('click', () => {
   void testConnection()
 })
 
-el('copy-origin').addEventListener('click', async () => {
-  const value = 'chrome-extension://' + chrome.runtime.id
-  try {
-    await navigator.clipboard.writeText(value)
-    showResult('已复制：' + value, 'ok')
-  } catch {
-    showResult(value, 'ok')
-  }
-})
-
-el('origin').textContent = 'chrome-extension://' + chrome.runtime.id
-
 el('refresh-destinations').addEventListener('click', async () => {
   const selected = el('destinationId').value
   const res = await loadDestinations(selected)
