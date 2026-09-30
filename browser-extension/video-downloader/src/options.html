@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="style.css">
+  <title>DIAN115 视频推送 · 设置</title>
+</head>
+<body>
+  <div class="wrap wide">
+    <div class="card">
+      <h2>连接 DIAN115</h2>
+      <label class="field">
+        <span>服务器地址</span>
+        <input type="text" id="baseUrl" placeholder="http://192.168.1.10:8080">
+      </label>
+      <label class="field">
+        <span>OpenAPI Key（系统设置里的 openapi key）</span>
+        <input type="password" id="apiKey" placeholder="粘贴系统设置中生成的 OpenAPI Key">
+      </label>
+      <div class="row">
+        <button id="test">测试连接</button>
+        <button class="primary" id="save">保存</button>
+      </div>
+      <div class="hint" id="test-result" hidden></div>
+    </div>
+
+    <div class="card">
+      <h2>在 DIAN115 里放行本扩展</h2>
+      <div class="small muted">
+        外部推送需要两道开关：DIAN115 的“视频下载器 → 外部 API”必须启用，
+        并且要把下面这个来源加进“允许来源”列表。否则服务器会返回 <span class="mono">origin_not_allowed</span>。
+      </div>
+      <div class="hint mono" id="origin">chrome-extension://</div>
+      <div class="row" style="margin-top:8px">
+        <button id="copy-origin">复制来源</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>推送默认值</h2>
+      <label class="field">
+        <span>下载模式</span>
+        <select id="mode">
+          <option value="video">视频</option>
+          <option value="audio">仅音频</option>
+        </select>
+      </label>
+      <label class="field">
+        <span>清晰度（可留空，例如 1080）</span>
+        <input type="text" id="quality" placeholder="留空表示使用服务器默认">
+      </label>
+      <label class="field">
+        <span>目标目录 ID（可留空，使用服务器默认目录）</span>
+        <input type="text" id="destinationId" placeholder="留空即可">
+      </label>
+      <label class="field">
+        <span>登录态配置 ID（可留空，登录后才可下载的站点需要）</span>
+        <input type="text" id="cookieProfileId" placeholder="留空即可">
+      </label>
+      <label class="check">
+        <input type="checkbox" id="autoListProbe">
+        <span>页面看起来像节目单时自动展开列表</span>
+      </label>
+      <label class="field">
+        <span>多少条以上先让我确认</span>
+        <input type="number" id="localConfirmThreshold" min="1" max="100">
+      </label>
+      <label class="field">
+        <span>预计体积超过多少 GB 先让我确认（0 表示不检查）</span>
+        <input type="number" id="confirmGb" min="0" step="1">
+      </label>
+      <label class="field">
+        <span>进度刷新间隔（秒，最小 30）</span>
+        <input type="number" id="pollSeconds" min="30" max="3600">
+      </label>
+    </div>
+
+    <div class="card">
+      <h2>站点 CK</h2>
+      <label class="check">
+        <input type="checkbox" id="updateCookies">
+        <span>推送时同时更新站点 CK（默认关闭）</span>
+      </label>
+      <div class="small muted">
+        开启后，每次推送会把当前页面的站点 Cookie 一并发送到 DIAN115，用于刷新“站点 CK（登录态）”里对应的配置。
+        关闭时不会读取、也不会发送任何 Cookie。仅建议在自己搭建的服务器上开启。
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>通知</h2>
+      <label class="check"><input type="checkbox" id="notifyOnQueued"><span>推送成功时提醒</span></label>
+      <label class="check"><input type="checkbox" id="notifyOnComplete"><span>下载完成时提醒</span></label>
+      <label class="check"><input type="checkbox" id="notifyOnFailed"><span>下载失败时提醒</span></label>
+    </div>
+
+    <div class="card">
+      <h2>关于隐私</h2>
+      <div class="small muted">
+        默认情况下，本扩展只发送页面地址和你在设置里填写的选项，不会上传 Cookie、账号或浏览历史。
+        只有在你手动开启“推送时同时更新站点 CK”后，才会把当前页面的站点 Cookie 发送到你自己的 DIAN115 服务器。
+        OpenAPI Key 保存在浏览器本地存储中，仅用于访问你填写的服务器地址。
+      </div>
+    </div>
+  </div>
+  <script type="module" src="options.js"></script>
+</body>
+</html>
