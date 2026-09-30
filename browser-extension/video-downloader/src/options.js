@@ -106,12 +106,12 @@ async function testConnection() {
     showResult('请先填写 OpenAPI Key。', 'bad')
     return
   }
-  // Querying a task that cannot exist proves key + external API are both
-  // accepted: a missing task answers 404 task_not_found, while a rejected
-  // request answers 401/403 with a specific code.
-  const res = await dianFetch(draft, '/tasks/0', { timeoutMs: 20000 })
-  if (res.status === 404 || res.ok) {
-    showResult('连接成功：OpenAPI Key 校验已通过。', 'ok')
+  // /destinations 同时要求「Key 正确」和「外部 API 已启用」，又不需要任务 id，
+  // 所以既不会误报，也不会像 /tasks/0 那样被参数校验挡成 400。
+  const res = await dianFetch(draft, '/destinations', { timeoutMs: 20000 })
+  if (res.ok) {
+    const list = res.data && Array.isArray(res.data.destinations) ? res.data.destinations : []
+    showResult(`连接成功：OpenAPI Key 校验已通过，服务器上有 ${list.length} 个受控下载目录。`, 'ok')
     return
   }
   if (res.status === 401) {
