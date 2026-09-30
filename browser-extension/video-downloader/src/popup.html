@@ -61,6 +61,42 @@
       <div id="tasks"></div>
     </div>
 
+    <div class="card" id="card-115">
+      <div class="row between">
+        <h2 class="grow">115 转存 / 离线</h2>
+        <span class="tag" id="p115-kind">未识别</span>
+      </div>
+      <div class="small muted ellipsis" id="p115-link">当前页面不是 115 分享 / 磁力 / ED2K 链接</div>
+      <label class="field">
+        <span>使用账号</span>
+        <select id="p115-account"></select>
+      </label>
+      <div class="row" style="margin-top:6px">
+        <button id="p115-share-browse">转存目录</button>
+        <span class="small muted ellipsis grow" id="p115-share-name">未选择</span>
+      </div>
+      <div class="row" style="margin-top:6px">
+        <button id="p115-offline-browse">离线目录</button>
+        <span class="small muted ellipsis grow" id="p115-offline-name">未选择</span>
+      </div>
+      <div class="card" id="p115-browser" hidden style="margin:8px 0 0;background:var(--soft)">
+        <div class="row between">
+          <div class="small muted ellipsis grow" id="p115-path">115 根目录</div>
+          <button class="ghost tiny" id="p115-up">上一级</button>
+        </div>
+        <div id="p115-dirs" class="small" style="margin-top:6px;max-height:160px;overflow:auto"></div>
+        <div class="row" style="margin-top:8px">
+          <button class="primary grow" id="p115-choose">选当前目录</button>
+          <button id="p115-close">收起</button>
+        </div>
+      </div>
+      <div class="row" style="margin-top:10px">
+        <button class="primary grow" id="p115-push">推送到 115</button>
+        <button id="p115-save">保存为默认</button>
+      </div>
+      <div class="hint" id="p115-status" hidden></div>
+    </div>
+
     <div class="footer">
       <a href="#" id="open-in-server" hidden>在 DIAN115 中查看</a>
       <a href="#" id="copy-id">复制扩展 ID</a>

@@ -4,6 +4,57 @@
 // service worker and from both extension pages.
 
 export const API_PREFIX = '/api/openapi/v1/video-downloads'
+/** 外部推送插件：115 分享转存 / 磁力 / ED2K 离线。 */
+export const PUSH115_PREFIX = '/api/openapi/v1/external-push'
+/** 115 账号与目录（用 DIAN115 已保存的账号，扩展不需要单独登录）。 */
+export const API115_PREFIX = '/api/openapi/v1/115'
+
+/**
+ * 115 推送的默认值单独存一份，和页面推送的 settings 完全隔离：
+ * 用户选了别的账号/目录不会影响原有的视频下载配置。
+ */
+export const PUSH115_DEFAULTS = {
+  accountMode: 'main',
+  accountId: 0,
+  accountName: '',
+  shareCid: '',
+  shareName: '',
+  offlineCid: '',
+  offlineName: '',
+}
+
+export async function loadPush115() {
+  const stored = await chrome.storage.local.get('push115')
+  return { ...PUSH115_DEFAULTS, ...(stored && stored.push115 ? stored.push115 : {}) }
+}
+
+export async function savePush115(patch) {
+  const current = await loadPush115()
+  const next = { ...current, ...patch }
+  await chrome.storage.local.set({ push115: next })
+  return next
+}
+
+const SHARE115_RE = /https?:\/\/(?:share\.)?115(?:\.com|cdn\.com)\/[^\s<>"'【】《》[\]]+/i
+const MAGNET_RE = /magnet:\?[^\s<>"'【】《》[\]]+/i
+const ED2K_RE = /ed2k:\/\/[^\s<>"'【】《》[\]]+/i
+
+/**
+ * 识别一段文本/地址属于哪种推送：115 分享、磁力、ED2K 还是普通视频页面。
+ * 返回 { kind, link, label }；kind 为 share115 | magnet | ed2k | video | unknown。
+ */
+export function detectPushLink(value) {
+  const text = String(value || '').trim()
+  if (!text) return { kind: 'unknown', link: '', label: '' }
+  let matched = text.match(SHARE115_RE)
+  if (matched) return { kind: 'share115', link: matched[0], label: '115 分享' }
+  matched = text.match(MAGNET_RE)
+  if (matched) return { kind: 'magnet', link: matched[0], label: '磁力' }
+  matched = text.match(ED2K_RE)
+  if (matched) return { kind: 'ed2k', link: matched[0], label: 'ED2K' }
+  if (/^https?:\/\//i.test(text)) return { kind: 'video', link: text, label: '视频页面' }
+  return { kind: 'unknown', link: text, label: '' }
+}
 
 export const ACTIVE_STATUSES = ['queued', 'resolving', 'downloading', 'postprocessing', 'paused']
 
@@ -57,11 +108,13 @@ export function normalizeBaseUrl(raw) {
   return value
 }
 
-// buildApiUrl joins the configured server with one OpenAPI path.
-export function buildApiUrl(settings, path) {
+// buildApiUrl joins the configured server with one OpenAPI path. The prefix is
+// overridable so the same helper serves the video-downloads, external-push and
+// 115 helper surfaces.
+export function buildApiUrl(settings, path, prefix = API_PREFIX) {
   const base = normalizeBaseUrl(settings.baseUrl)
   if (!base) return ''
-  return base + API_PREFIX + path
+  return base + prefix + path
 }
 
 export function newIdempotencyKey() {
@@ -77,7 +130,7 @@ export function newIdempotencyKey() {
  * status: callers inspect `ok`, `status` and the parsed `code` instead.
  */
 export async function dianFetch(settings, path, options = {}) {
-  const url = buildApiUrl(settings, path)
+  const url = buildApiUrl(settings, path, options.prefix || API_PREFIX)
   if (!url) {
     return { ok: false, status: 0, code: 'not_configured', message: '尚未配置 DIAN115 服务器地址', data: null }
   }
@@ -225,4 +278,66 @@ export async function collectSiteCookies(pageUrl) {
       httpOnly: item.httpOnly === true,
     }))
   return { host, cookies }
+}
+
+// ---------------------------------------------------------------- 115 helper
+
+/** 列出 DIAN115 里可用（已保存 Cookie）的 115 账号。 */
+export async function fetch115Accounts(settings) {
+  const res = await dianFetch(settings, '/accounts', { prefix: API115_PREFIX, timeoutMs: 20000 })
+  if (!res.ok) return { ok: false, message: res.message || res.code || '读取账号失败', accounts: [], defaultAccount: null }
+  const data = res.data || {}
+  return {
+    ok: true,
+    accounts: Array.isArray(data.accounts) ? data.accounts : [],
+    defaultAccount: data.default || null,
+  }
+}
+
+/** 用 DIAN115 已保存的账号列出某个 CID 下的子目录，用来选转存/离线目标。 */
+export async function fetch115Dirs(settings, cid, account) {
+  const params = new URLSearchParams()
+  params.set('cid', String(cid || '0'))
+  if (account && account.mode) params.set('account_mode', String(account.mode))
+  if (account && Number(account.id) > 0) params.set('account_id', String(account.id))
+  const res = await dianFetch(settings, '/dirs?' + params.toString(), { prefix: API115_PREFIX, timeoutMs: 30000 })
+  if (!res.ok) return { ok: false, message: res.message || res.code || '读取目录失败', dirs: [] }
+  const data = res.data || {}
+  return { ok: true, dirs: Array.isArray(data.dirs) ? data.dirs : [], cid: data.cid || cid }
+}
+
+/** 提交一条 115 分享/磁力/ED2K 到外部推送插件，返回 request_id。 */
+export async function submitExternalPush(settings, { link, source, targetCid }) {
+  const body = { source: source || '浏览器扩展', link: String(link || '') }
+  if (targetCid) body.target_cid = String(targetCid)
+  const res = await dianFetch(settings, '', {
+    prefix: PUSH115_PREFIX,
+    method: 'POST',
+    body,
+    idempotencyKey: newIdempotencyKey(),
+    timeoutMs: 30000,
+  })
+  if (!res.ok) return { ok: false, message: res.message || res.code || '推送失败' }
+  const data = res.data || {}
+  return { ok: true, requestId: data.request_id || '', status: data.status || 'queued', type: data.type || '' }
+}
+
+/** 查询外部推送的执行结果。 */
+export async function fetchExternalPushStatus(settings, requestId) {
+  if (!requestId) return { ok: false, message: '缺少请求 ID' }
+  const res = await dianFetch(settings, '/' + encodeURIComponent(requestId), { prefix: PUSH115_PREFIX, timeoutMs: 20000 })
+  if (!res.ok) return { ok: false, message: res.message || res.code || '查询失败' }
+  return { ok: true, record: res.data || {} }
+}
+
+/** 视频下载可用的目标目录（供扩展做下拉，不再手输目录 ID）。 */
+export async function fetchVideoDestinations(settings) {
+  const res = await dianFetch(settings, '/destinations', { timeoutMs: 20000 })
+  if (!res.ok) return { ok: false, message: res.message || res.code || '读取目录失败', destinations: [], defaultId: '' }
+  const data = res.data || {}
+  return {
+    ok: true,
+    destinations: Array.isArray(data.destinations) ? data.destinations : [],
+    defaultId: data.default_id || '',
+  }
 }

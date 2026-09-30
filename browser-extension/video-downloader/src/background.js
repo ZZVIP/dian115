@@ -8,9 +8,16 @@ import {
   dianFetch,
   extractUrlsFromText,
   formatBytes,
+  detectPushLink,
+  fetch115Accounts,
+  fetch115Dirs,
+  fetchExternalPushStatus,
   loadSettings,
+  loadPush115,
   looksLikePlaylistUrl,
   newIdempotencyKey,
+  savePush115,
+  submitExternalPush,
   truncate,
 } from './common.js'
 
@@ -22,6 +29,7 @@ const MENU_PAGE = 'dian115-push-page'
 const MENU_LIST = 'dian115-push-list'
 const MENU_LINK = 'dian115-push-link'
 const MENU_SELECTION = 'dian115-push-selection'
+const MENU_PUSH115 = 'dian115-push-115'
 
 const MAX_TRACKED = 30
 
@@ -79,6 +87,11 @@ async function buildMenus() {
     title: '推送选中的链接到 DIAN115',
     contexts: ['selection'],
   })
+  chrome.contextMenus.create({
+    id: MENU_PUSH115,
+    title: '推送到 115（转存 / 离线）',
+    contexts: ['page', 'link', 'selection'],
+  })
 }
 
 chrome.contextMenus.onClicked.addListener((info, tab) => {
@@ -86,6 +99,11 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
 })
 
 async function handleMenuClick(info, tab) {
+  if (info.menuItemId === MENU_PUSH115) {
+    const candidate = info.linkUrl || info.selectionText || info.pageUrl || (tab && tab.url) || ''
+    await startPush115(candidate, { source: '右键菜单' })
+    return
+  }
   if (info.menuItemId === MENU_LINK && info.linkUrl) {
     await startPush([info.linkUrl], { source: 'link' })
     return
@@ -109,6 +127,67 @@ async function handleMenuClick(info, tab) {
 }
 
 // --------------------------------------------------------------- push flow
+
+/**
+ * 把一条 115 分享 / 磁力 / ED2K 交给「外部推送」插件处理。
+ * 目标目录优先用调用方传入的（弹窗里临时选择的），否则用扩展里保存的默认值。
+ */
+async function startPush115(rawValue, options = {}) {
+  const settings = await loadSettings()
+  if (!settings.baseUrl || !settings.apiKey) {
+    await notify('尚未配置 DIAN115', '请先在扩展设置里填写服务器地址和 OpenAPI Key。', { openOptions: true })
+    return { ok: false, code: 'not_configured' }
+  }
+  const detected = detectPushLink(rawValue)
+  if (detected.kind !== 'share115' && detected.kind !== 'magnet' && detected.kind !== 'ed2k') {
+    await notify('没有识别到 115 链接', '支持 115 分享链接、磁力链接和 ED2K 链接。')
+    return { ok: false, code: 'no_115_link' }
+  }
+  const defaults = await loadPush115()
+  const isShare = detected.kind === 'share115'
+  const targetCid = String(
+    options.targetCid
+    || (isShare ? defaults.shareCid : defaults.offlineCid)
+    || '',
+  ).trim()
+  if (!targetCid) {
+    await notify('请先选择 115 目录', (isShare ? '转存' : '离线') + '目标目录未设置：打开扩展弹窗选一次并「保存为默认」即可。')
+    return { ok: false, code: 'target_missing' }
+  }
+  const submit = await submitExternalPush(settings, {
+    link: detected.link,
+    source: options.source || '浏览器扩展',
+    targetCid,
+  })
+  if (!submit.ok) {
+    await notify('115 推送失败', submit.message || 'DIAN115 返回了错误。')
+    return { ok: false, code: 'submit_failed', message: submit.message }
+  }
+  if (options.deferPoll) {
+    return { ok: true, requestId: submit.requestId, kind: detected.kind, type: submit.type }
+  }
+  const finished = await pollExternalPush(settings, submit.requestId, 60)
+  await notify(finished.ok ? '已推送到 115' : '115 推送失败', finished.message)
+  return { ok: finished.ok, requestId: submit.requestId, message: finished.message }
+}
+
+/** 轮询外部推送结果；成功后返回目标路径，失败返回原因。 */
+async function pollExternalPush(settings, requestId, timeoutSeconds = 60) {
+  if (!requestId) return { ok: true, message: '已提交，可稍后在 DIAN115 的外部推送记录里查看结果' }
+  const deadline = Date.now() + timeoutSeconds * 1000
+  while (Date.now() < deadline) {
+    const res = await fetchExternalPushStatus(settings, requestId)
+    if (!res.ok) return { ok: false, message: res.message || '查询推送状态失败' }
+    const record = res.record || {}
+    const status = String(record.status || '')
+    if (status === 'succeeded') return { ok: true, status, record, message: '已完成：' + (record.target_path || record.link_display || '') }
+    if (status === 'failed' || status === 'rejected') {
+      return { ok: false, status, record, message: record.error || record.error_code || '115 处理失败' }
+    }
+    await new Promise((resolve) => setTimeout(resolve, 3000))
+  }
+  return { ok: true, status: 'processing', message: '已提交，仍在处理中，可稍后在 DIAN115 里查看结果' }
+}
 
 async function startPush(rawUrls, options = {}) {
   const urls = (rawUrls || []).map((u) => String(u || '').trim()).filter(Boolean)
@@ -460,6 +539,38 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     if (type === 'push') {
       const result = await startPush((message && message.urls) || [], { probe: message && message.probe, source: 'popup' })
       sendResponse(result || { ok: true })
+      return
+    }
+    if (type === 'push115') {
+      const result = await startPush115((message && message.link) || '', {
+        source: '浏览器扩展',
+        targetCid: message && message.targetCid,
+        deferPoll: true,
+      })
+      sendResponse(result || { ok: true })
+      return
+    }
+    if (type === 'push115Status') {
+      const settings = await loadSettings()
+      const res = await fetchExternalPushStatus(settings, (message && message.requestId) || '')
+      sendResponse(res)
+      return
+    }
+    if (type === 'accounts115') {
+      const settings = await loadSettings()
+      sendResponse(await fetch115Accounts(settings))
+      return
+    }
+    if (type === 'dirs115') {
+      const settings = await loadSettings()
+      sendResponse(await fetch115Dirs(settings, message && message.cid, {
+        mode: message && message.accountMode,
+        id: message && message.accountId,
+      }))
+      return
+    }
+    if (type === 'save115Defaults') {
+      sendResponse({ ok: true, push115: await savePush115((message && message.push115) || {}) })
       return
     }
     if (type === 'confirm') {

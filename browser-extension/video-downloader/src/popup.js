@@ -1,6 +1,8 @@
 import {
   ACTIVE_STATUSES,
   STATUS_LABELS,
+  PUSH115_DEFAULTS,
+  detectPushLink,
   formatBytes,
   formatDuration,
   hostOf,
@@ -256,6 +258,228 @@ el('mode').addEventListener('change', async () => {
   })
 })
 
-void loadTab()
-void loadState()
+// ----------------------------------------------------- 115 转存 / 离线
+
+// 115 的账号与目录默认值单独保存，完全不碰页面推送用的 settings。
+let push115 = { ...PUSH115_DEFAULTS }
+let accounts115 = []
+let detected115 = { kind: 'unknown', link: '', label: '' }
+let browse115 = { kind: 'share', stack: [{ cid: '0', name: '115 根目录' }] }
+let push115Polling = null
+
+function accountKey(account) {
+  return `${account.mode || 'main'}:${Number(account.id) || 0}`
+}
+
+function currentAccount() {
+  const key = el('p115-account') ? el('p115-account').value : ''
+  return accounts115.find((item) => accountKey(item) === key) || { mode: 'main', id: 0, name: '' }
+}
+
+function setStatus(text, kind) {
+  const node = el('p115-status')
+  if (!node) return
+  if (!text) { node.hidden = true; node.textContent = ''; return }
+  node.hidden = false
+  node.textContent = text
+  node.style.color = kind === 'ok' ? 'var(--ok)' : (kind === 'bad' ? 'var(--danger)' : '')
+}
+
+function renderPush115() {
+  const kindNode = el('p115-kind')
+  const linkNode = el('p115-link')
+  if (kindNode) {
+    const labels = { share115: '115 分享', magnet: '磁力', ed2k: 'ED2K', video: '视频页面', unknown: '未识别' }
+    kindNode.textContent = labels[detected115.kind] || '未识别'
+    kindNode.className = 'tag ' + (detected115.kind === 'unknown' || detected115.kind === 'video' ? '' : 'ok')
+  }
+  if (linkNode) {
+    linkNode.textContent = detected115.link
+      ? detected115.link
+      : '当前页面不是 115 分享 / 磁力 / ED2K 链接（可右键链接或选中文字推送）'
+  }
+  const shareName = el('p115-share-name')
+  const offlineName = el('p115-offline-name')
+  if (shareName) shareName.textContent = push115.shareCid ? (push115.shareName || ('CID ' + push115.shareCid)) : '未选择'
+  if (offlineName) offlineName.textContent = push115.offlineCid ? (push115.offlineName || ('CID ' + push115.offlineCid)) : '未选择'
+}
+
+function fillAccounts(defaultAccount) {
+  const select = el('p115-account')
+  if (!select) return
+  select.innerHTML = ''
+  if (!accounts115.length) {
+    const option = document.createElement('option')
+    option.value = ''
+    option.textContent = '没有可用的 115 账号'
+    select.appendChild(option)
+    return
+  }
+  for (const account of accounts115) {
+    const option = document.createElement('option')
+    option.value = accountKey(account)
+    const suffix = account.mode === 'backup' ? '（备用号）' : '（主账号）'
+    option.textContent = `${account.name || account.user_name || '未命名账号'}${suffix}${account.cookie_valid === false ? ' · CK 失效' : ''}`
+    select.appendChild(option)
+  }
+  const preferred = push115.accountId
+    ? accountKey({ mode: push115.accountMode, id: push115.accountId })
+    : (defaultAccount ? accountKey(defaultAccount) : '')
+  const fallback = accountKey(accounts115[0])
+  select.value = accounts115.some((item) => accountKey(item) === preferred) ? preferred : fallback
+}
+
+async function load115() {
+  const stored = await chrome.storage.local.get('push115')
+  push115 = { ...PUSH115_DEFAULTS, ...(stored && stored.push115 ? stored.push115 : {}) }
+  const response = await send({ type: 'accounts115' })
+  accounts115 = response && response.ok && Array.isArray(response.accounts) ? response.accounts : []
+  fillAccounts(response && response.defaultAccount)
+  if (!accounts115.length) setStatus(response && response.message ? response.message : '读不到 115 账号，请先在 DIAN115 的账号配置里添加并启用。', 'bad')
+  renderPush115()
+}
+
+function renderDirList(dirs) {
+  const host = el('p115-dirs')
+  if (!host) return
+  host.innerHTML = ''
+  if (!dirs.length) {
+    host.innerHTML = '<div class="muted">这里没有子目录</div>'
+    return
+  }
+  for (const dir of dirs) {
+    const button = document.createElement('button')
+    button.className = 'ghost tiny'
+    button.style.display = 'block'
+    button.style.width = '100%'
+    button.style.textAlign = 'left'
+    button.textContent = '📁 ' + dir.name
+    button.addEventListener('click', () => {
+      browse115.stack.push({ cid: dir.cid, name: dir.name })
+      void loadDirs115()
+    })
+    host.appendChild(button)
+  }
+}
+
+async function loadDirs115() {
+  const account = currentAccount()
+  const current = browse115.stack[browse115.stack.length - 1]
+  el('p115-path').textContent = browse115.stack.map((item) => item.name).join(' / ')
+  el('p115-dirs').innerHTML = '<div class="muted">正在读取…</div>'
+  const res = await send({ type: 'dirs115', cid: current.cid, accountMode: account.mode, accountId: account.id })
+  if (!res || !res.ok) {
+    el('p115-dirs').innerHTML = '<div class="muted">' + escapeHtml((res && res.message) || '读取目录失败') + '</div>'
+    return
+  }
+  renderDirList(res.dirs || [])
+}
+
+function openBrowser115(kind) {
+  browse115 = { kind, stack: [{ cid: '0', name: '115 根目录' }] }
+  el('p115-browser').hidden = false
+  void loadDirs115()
+}
+
+async function pushLink115() {
+  if (detected115.kind !== 'share115' && detected115.kind !== 'magnet' && detected115.kind !== 'ed2k') {
+    setStatus('当前页面没有识别到 115 分享 / 磁力 / ED2K 链接。', 'bad')
+    return
+  }
+  const account = currentAccount()
+  const isShare = detected115.kind === 'share115'
+  const targetCid = isShare ? push115.shareCid : push115.offlineCid
+  if (!targetCid) {
+    setStatus('请先选择' + (isShare ? '转存' : '离线') + '目录。', 'bad')
+    return
+  }
+  setStatus('正在提交…')
+  const res = await send({
+    type: 'push115',
+    link: detected115.link,
+    targetCid,
+    accountMode: account.mode,
+    accountId: account.id,
+  })
+  if (!res || !res.ok) {
+    setStatus((res && res.message) || '推送失败', 'bad')
+    return
+  }
+  setStatus('已提交，正在等待 115 处理…')
+  if (push115Polling) clearInterval(push115Polling)
+  let attempts = 0
+  push115Polling = setInterval(async () => {
+    attempts += 1
+    const status = await send({ type: 'push115Status', requestId: res.requestId })
+    const record = (status && status.record) || {}
+    if (record.status === 'succeeded') {
+      clearInterval(push115Polling); push115Polling = null
+      setStatus('已完成：' + (record.target_path || record.link_display || ''), 'ok')
+      return
+    }
+    if (record.status === 'failed' || record.status === 'rejected') {
+      clearInterval(push115Polling); push115Polling = null
+      setStatus(record.error || record.error_code || '115 处理失败', 'bad')
+      return
+    }
+    if (attempts >= 20) {
+      clearInterval(push115Polling); push115Polling = null
+      setStatus('已提交，仍在处理中，可稍后在 DIAN115 里查看结果。')
+    }
+  }, 3000)
+}
+
+el('p115-account').addEventListener('change', () => {
+  if (!el('p115-browser').hidden) void loadDirs115()
+})
+el('p115-share-browse').addEventListener('click', () => openBrowser115('share'))
+el('p115-offline-browse').addEventListener('click', () => openBrowser115('offline'))
+el('p115-up').addEventListener('click', () => {
+  if (browse115.stack.length > 1) {
+    browse115.stack.pop()
+    void loadDirs115()
+  }
+})
+el('p115-close').addEventListener('click', () => { el('p115-browser').hidden = true })
+el('p115-choose').addEventListener('click', () => {
+  const current = browse115.stack[browse115.stack.length - 1]
+  if (browse115.kind === 'share') {
+    push115.shareCid = String(current.cid)
+    push115.shareName = current.name
+  } else {
+    push115.offlineCid = String(current.cid)
+    push115.offlineName = current.name
+  }
+  el('p115-browser').hidden = true
+  renderPush115()
+  setStatus('已选择「' + current.name + '」，点「保存为默认」后下次推送会沿用。')
+})
+el('p115-push').addEventListener('click', () => void pushLink115())
+el('p115-save').addEventListener('click', async () => {
+  const account = currentAccount()
+  const res = await send({
+    type: 'save115Defaults',
+    push115: {
+      accountMode: account.mode,
+      accountId: Number(account.id) || 0,
+      accountName: account.name || '',
+      shareCid: push115.shareCid || '',
+      shareName: push115.shareName || '',
+      offlineCid: push115.offlineCid || '',
+      offlineName: push115.offlineName || '',
+    },
+  })
+  const saved = (res && res.push115) || push115
+  push115 = { ...PUSH115_DEFAULTS, ...saved }
+  renderPush115()
+  setStatus('已保存为默认（不影响页面推送的下载配置）。', 'ok')
+})
+
+void (async () => {
+  await loadTab()
+  detected115 = detectPushLink((currentTab && currentTab.url) || '')
+  renderPush115()
+  await load115()
+  void loadState()
+})()
 setInterval(() => void loadState(), 5000)

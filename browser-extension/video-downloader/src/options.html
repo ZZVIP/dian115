@@ -50,8 +50,13 @@
         <input type="text" id="quality" placeholder="留空表示使用服务器默认">
       </label>
       <label class="field">
-        <span>目标目录 ID（可留空，使用服务器默认目录）</span>
-        <input type="text" id="destinationId" placeholder="留空即可">
+        <span>目标目录（从服务器读取，不再手输）</span>
+        <div class="row">
+          <select id="destinationId" class="grow">
+            <option value="">使用服务器默认目录</option>
+          </select>
+          <button class="ghost tiny" id="refresh-destinations" type="button">刷新</button>
+        </div>
       </label>
       <label class="field">
         <span>登录态配置 ID（可留空，登录后才可下载的站点需要）</span>
@@ -92,6 +97,18 @@
       <label class="check"><input type="checkbox" id="notifyOnQueued"><span>推送成功时提醒</span></label>
       <label class="check"><input type="checkbox" id="notifyOnComplete"><span>下载完成时提醒</span></label>
       <label class="check"><input type="checkbox" id="notifyOnFailed"><span>下载失败时提醒</span></label>
+    </div>
+
+    <div class="card">
+      <h2>115 转存 / 离线默认值</h2>
+      <div class="small muted">
+        账号与目标目录在扩展弹窗里选择（用 DIAN115 已保存的 115 账号浏览目录），点「保存为默认」后写入这里。
+        这些默认值独立保存，**不会影响页面推送的下载配置**。
+      </div>
+      <div class="hint mono" id="push115-summary">未设置</div>
+      <div class="row" style="margin-top:8px">
+        <button id="clear115" type="button">清除 115 默认值</button>
+      </div>
     </div>
 
     <div class="card">

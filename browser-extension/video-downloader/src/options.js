@@ -1,4 +1,14 @@
-import { DEFAULT_SETTINGS, dianFetch, loadSettings, normalizeBaseUrl, saveSettings } from './common.js'
+import {
+  DEFAULT_SETTINGS,
+  PUSH115_DEFAULTS,
+  dianFetch,
+  fetchVideoDestinations,
+  loadPush115,
+  loadSettings,
+  normalizeBaseUrl,
+  savePush115,
+  saveSettings,
+} from './common.js'
 
 const el = (id) => document.getElementById(id)
 const GB = 1024 * 1024 * 1024
@@ -36,7 +46,7 @@ function fillForm(settings) {
   el('apiKey').value = settings.apiKey || ''
   el('mode').value = settings.mode || 'video'
   el('quality').value = settings.quality || ''
-  el('destinationId').value = settings.destinationId || ''
+  fillDestinationOptions(settings.destinationId || '')
   el('cookieProfileId').value = settings.cookieProfileId || ''
   el('updateCookies').checked = settings.updateCookies === true
   el('autoListProbe').checked = settings.autoListProbe !== false
@@ -46,6 +56,37 @@ function fillForm(settings) {
   el('notifyOnQueued').checked = settings.notifyOnQueued !== false
   el('notifyOnComplete').checked = settings.notifyOnComplete !== false
   el('notifyOnFailed').checked = settings.notifyOnFailed !== false
+}
+
+/** 用服务器返回的受控目录填充下拉，避免手输目录 ID。 */
+async function loadDestinations(selected) {
+  const settings = { ...readForm() }
+  const res = await fetchVideoDestinations(settings)
+  const select = el('destinationId')
+  select.innerHTML = '<option value="">使用服务器默认目录</option>'
+  if (res.ok) {
+    for (const item of res.destinations) {
+      const option = document.createElement('option')
+      option.value = item.id
+      option.textContent = item.name + (item.free_bytes ? `（剩余 ${Math.round(Number(item.free_bytes) / 1024 / 1024 / 1024 * 10) / 10} GB）` : '')
+      select.appendChild(option)
+    }
+    if (!select.value && res.defaultId) select.value = res.defaultId
+  }
+  if (selected !== undefined) select.value = selected || ''
+  return res
+}
+
+function fillDestinationOptions(selected) {
+  const select = el('destinationId')
+  select.innerHTML = '<option value="">使用服务器默认目录</option>'
+  if (selected) {
+    const option = document.createElement('option')
+    option.value = selected
+    option.textContent = selected + '（点「刷新」读取名称）'
+    select.appendChild(option)
+    select.value = selected
+  }
 }
 
 async function testConnection() {
@@ -58,12 +99,12 @@ async function testConnection() {
     showResult('请先填写 OpenAPI Key。', 'bad')
     return
   }
-  // Querying a task that cannot exist proves key + origin + external API are
-  // all accepted: a missing task answers 404 task_not_found, while a rejected
+  // Querying a task that cannot exist proves key + external API are both
+  // accepted: a missing task answers 404 task_not_found, while a rejected
   // request answers 401/403 with a specific code.
   const res = await dianFetch(draft, '/tasks/0', { timeoutMs: 20000 })
   if (res.status === 404 || res.ok) {
-    showResult('连接成功：鉴权与来源校验都已通过。', 'ok')
+    showResult('连接成功：OpenAPI Key 校验已通过。', 'ok')
     return
   }
   if (res.status === 401) {
@@ -73,8 +114,6 @@ async function testConnection() {
   if (res.status === 403) {
     if (res.code === 'external_api_disabled') {
       showResult('服务器未启用外部 API，请到“视频下载器 → 外部 API”打开开关。', 'bad')
-    } else if (res.code === 'origin_not_allowed' || res.code === 'origin_required') {
-      showResult('来源未放行：把上面的 chrome-extension:// 来源加入“允许来源”。', 'bad')
     } else {
       showResult(res.message || '服务器拒绝了这次请求。', 'bad')
     }
@@ -109,4 +148,31 @@ el('copy-origin').addEventListener('click', async () => {
 
 el('origin').textContent = 'chrome-extension://' + chrome.runtime.id
 
-void loadSettings().then(fillForm)
+el('refresh-destinations').addEventListener('click', async () => {
+  const selected = el('destinationId').value
+  const res = await loadDestinations(selected)
+  showResult(res.ok ? '已读取服务器上的受控目录。' : (res.message || '读取目录失败'), res.ok ? 'ok' : 'bad')
+})
+
+el('clear115').addEventListener('click', async () => {
+  await savePush115(PUSH115_DEFAULTS)
+  await renderPush115Summary()
+  showResult('已清除 115 默认值（页面推送配置不受影响）。', 'ok')
+})
+
+async function renderPush115Summary() {
+  const push115 = await loadPush115()
+  const parts = []
+  if (push115.accountName || push115.accountId) parts.push('账号：' + (push115.accountName || ('#' + push115.accountId)))
+  if (push115.shareCid) parts.push('转存目录：' + (push115.shareName || push115.shareCid))
+  if (push115.offlineCid) parts.push('离线目录：' + (push115.offlineName || push115.offlineCid))
+  el('push115-summary').textContent = parts.length ? parts.join('\n') : '未设置（在扩展弹窗里选择并「保存为默认」）'
+  el('push115-summary').style.whiteSpace = 'pre-line'
+}
+
+void loadSettings().then(async (settings) => {
+  fillForm(settings)
+  await renderPush115Summary()
+  // 有服务器地址与 key 时顺带把目录下拉填满，失败也不打扰用户。
+  if (settings.baseUrl && settings.apiKey) void loadDestinations(settings.destinationId || '')
+})
