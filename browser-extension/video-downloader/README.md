@@ -25,7 +25,7 @@ browser-extension/video-downloader/
 下载地址（打包好的 zip，`manifest.json` 就在压缩包根目录）：
 
 ```
-https://raw.githubusercontent.com/madbrolab/dian115/video-downloader-extension/video-downloader-extension.zip
+https://raw.githubusercontent.com/madbrolab/dian115/main/browser-extension/video-downloader-extension.zip
 ```
 
 1. 下载上面的 zip。
