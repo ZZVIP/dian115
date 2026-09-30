@@ -192,6 +192,8 @@ async function pollExternalPush(settings, requestId, timeoutSeconds = 60) {
 async function startPush(rawUrls, options = {}) {
   const urls = (rawUrls || []).map((u) => String(u || '').trim()).filter(Boolean)
   if (!urls.length) return { ok: false, code: 'no_url' }
+  // 用户在预览里点选的格式 id；为空时由服务端按 quality/默认规则挑。
+  const formatId = String(options.formatId || '').trim()
   const settings = await loadSettings()
   if (!settings.baseUrl || !settings.apiKey) {
     await notify(
@@ -235,10 +237,11 @@ async function startPush(rawUrls, options = {}) {
       preview,
       confirmToken: preview.confirm_token || '',
       reason: 'local',
+      formatId,
     })
   }
 
-  return await submitBatch(urls, preview, settings, '', cookieSync)
+  return await submitBatch(urls, preview, settings, '', cookieSync, formatId)
 }
 
 function needsLocalConfirmation(settings, preview) {
@@ -251,14 +254,16 @@ function needsLocalConfirmation(settings, preview) {
   return false
 }
 
-async function submitBatch(urls, preview, settings, confirmToken, cookieSync = null) {
+async function submitBatch(urls, preview, settings, confirmToken, cookieSync = null, formatId = '') {
   const body = {
     urls,
     mode: settings.mode,
     playlist: false,
     dedupe: true,
   }
-  if (settings.quality) body.quality = settings.quality
+  // 具体格式优先于清晰度筛选；两者都由服务端再校验一次。
+  if (formatId) body.format_id = formatId
+  else if (settings.quality) body.quality = settings.quality
   if (settings.destinationId) body.destination_id = settings.destinationId
   if (settings.cookieProfileId) body.cookie_profile_id = settings.cookieProfileId
   if (urls.length === 1 && preview && Number(preview.total_items || 0) > 1) {
@@ -289,6 +294,7 @@ async function submitBatch(urls, preview, settings, confirmToken, cookieSync = n
       confirmToken: info.confirm_token || '',
       expiresAt: info.confirm_expires_at || '',
       reason: 'server',
+      formatId,
     })
   }
 
@@ -343,6 +349,7 @@ async function openConfirmation(pending) {
     confirmToken: pending.confirmToken || '',
     expiresAt: pending.expiresAt || '',
     reason: pending.reason || '',
+    formatId: pending.formatId || '',
     createdAt: Date.now(),
   }
   await chrome.storage.local.set({ pendingPush: record })
@@ -378,7 +385,7 @@ async function resolvePending(approve) {
     return { ok: true, cancelled: true }
   }
   const settings = await loadSettings()
-  return await submitBatch(pending.urls, pending.preview, settings, pending.confirmToken)
+  return await submitBatch(pending.urls, pending.preview, settings, pending.confirmToken, null, pending.formatId || '')
 }
 
 chrome.notifications.onButtonClicked.addListener((notificationId, buttonIndex) => {
@@ -537,7 +544,11 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
       return
     }
     if (type === 'push') {
-      const result = await startPush((message && message.urls) || [], { probe: message && message.probe, source: 'popup' })
+      const result = await startPush((message && message.urls) || [], {
+        probe: message && message.probe,
+        formatId: message && message.formatId,
+        source: 'popup',
+      })
       sendResponse(result || { ok: true })
       return
     }

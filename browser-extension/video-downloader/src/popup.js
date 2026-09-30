@@ -14,6 +14,7 @@ const el = (id) => document.getElementById(id)
 let runtimeId = ''
 let currentTab = null
 let lastPreview = null
+let lastFormats = []
 
 function send(message) {
   return new Promise((resolve) => chrome.runtime.sendMessage(message, (response) => resolve(response || { ok: false })))
@@ -111,6 +112,63 @@ function escapeHtml(value) {
     .replace(/"/g, '&quot;')
 }
 
+/** 服务端格式项 → 一行可读文案（推荐、清晰度、编码、容器、体积、是否要合并音轨）。 */
+function formatOptionLabel(item) {
+  const codec = item.vcodec && item.vcodec !== 'none' ? item.vcodec : item.acodec
+  const size = Number(item.filesize || item.filesize_approx || 0)
+  const parts = [
+    item.recommended ? '★ 推荐' : '',
+    item.resolution,
+    codec,
+    item.container,
+    size > 0 ? formatBytes(size) : '',
+    item.needs_audio ? '需合并音轨' : '',
+  ].filter(Boolean)
+  return parts.join(' · ') || item.label || String(item.id)
+}
+
+/** 按当前下载模式挑出可选格式：推荐项最前，其余按分辨率、码率降序。 */
+function visibleFormats() {
+  const mode = el('mode').value === 'audio' ? 'audio' : 'video'
+  return (lastFormats || [])
+    .filter((item) => {
+      const kind = item.kind || 'video'
+      return mode === 'audio' ? kind === 'audio' : kind !== 'audio'
+    })
+    .sort((a, b) => {
+      if (!!b.recommended !== !!a.recommended) return b.recommended ? 1 : -1
+      const height = Number(b.height || 0) - Number(a.height || 0)
+      if (height) return height
+      return Number(b.tbr || 0) - Number(a.tbr || 0)
+    })
+}
+
+/** 重建格式下拉；默认选中推荐项，并尽量保留用户已选的那一条。 */
+function renderFormatOptions() {
+  const field = el('preview-format-field')
+  const select = el('preview-format')
+  const list = visibleFormats()
+  if (!list.length) {
+    select.innerHTML = ''
+    field.hidden = true
+    return
+  }
+  const previous = select.value
+  select.innerHTML = list
+    .map((item) => `<option value="${escapeHtml(item.id)}">${escapeHtml(formatOptionLabel(item))}</option>`)
+    .join('')
+  const keep = list.some((item) => String(item.id) === previous) ? previous : String(list[0].id)
+  select.value = keep
+  field.hidden = false
+}
+
+/** 预览里选中的格式 id；没有下拉（未解析/无可用格式）时返回空串。 */
+function selectedFormatId() {
+  const field = el('preview-format-field')
+  if (!field || field.hidden) return ''
+  return el('preview-format').value || ''
+}
+
 function renderPreview(preview, probe) {
   const card = el('preview-card')
   if (!preview) {
@@ -118,6 +176,7 @@ function renderPreview(preview, probe) {
     return
   }
   lastPreview = { preview, probe }
+  lastFormats = Array.isArray(preview.formats) ? preview.formats : []
   el('preview-title').textContent = preview.title || '(未命名)'
   el('preview-probe').textContent = probe === 'list' ? '节目单' : '单个视频'
   const source = [preview.extractor, hostOf(preview.webpage_url || '')].filter(Boolean).join(' · ')
@@ -136,6 +195,7 @@ function renderPreview(preview, probe) {
   if (preview.duration) stats.push(`<div><b>${formatDuration(preview.duration)}</b>时长</div>`)
   if (preview.is_live) stats.push('<div><b>直播</b>进行中</div>')
   el('preview-stats').innerHTML = stats.join('')
+  renderFormatOptions()
   const list = el('preview-items')
   if (Array.isArray(preview.items) && preview.items.length) {
     list.innerHTML = preview.items.slice(0, 30).map((item) => `
@@ -194,7 +254,7 @@ async function probe(probeName) {
 
 el('push-page').addEventListener('click', async () => {
   if (!currentTab || !currentTab.url) return
-  const res = await send({ type: 'push', urls: [currentTab.url], probe: 'quick' })
+  const res = await send({ type: 'push', urls: [currentTab.url], probe: 'quick', formatId: selectedFormatId() })
   if (res && res.pending) toast('需要确认后才会开始下载')
   else if (res && res.ok) toast('已加入下载队列')
   await loadState()
@@ -204,7 +264,12 @@ el('probe-list').addEventListener('click', () => void probe('list'))
 
 el('preview-push').addEventListener('click', async () => {
   if (!lastPreview || !currentTab) return
-  const res = await send({ type: 'push', urls: [currentTab.url], probe: lastPreview.probe })
+  const res = await send({
+    type: 'push',
+    urls: [currentTab.url],
+    probe: lastPreview.probe,
+    formatId: selectedFormatId(),
+  })
   if (res && res.pending) toast('需要确认后才会开始下载')
   else if (res && res.ok) toast('已加入下载队列')
   else if (res && res.message) toast(res.message)
@@ -213,6 +278,9 @@ el('preview-push').addEventListener('click', async () => {
 
 el('preview-close').addEventListener('click', () => {
   lastPreview = null
+  lastFormats = []
+  el('preview-format').innerHTML = ''
+  el('preview-format-field').hidden = true
   el('preview-card').hidden = true
 })
 
@@ -245,6 +313,8 @@ el('mode').addEventListener('change', async () => {
     const settings = { ...(stored.settings || {}), mode: el('mode').value }
     return chrome.storage.local.set({ settings })
   })
+  // 模式变了，可选格式也不同，按新模式重挑一遍。
+  if (lastFormats.length) renderFormatOptions()
 })
 
 // ----------------------------------------------------- 115 转存 / 离线

@@ -41,11 +41,18 @@ function readForm() {
   }
 }
 
+/** 清晰度下拉：旧值不在预设里时回落到「自动」。 */
+function fillQualityOptions(value) {
+  const select = el('quality')
+  const allowed = Array.from(select.options).map((option) => option.value)
+  select.value = allowed.includes(String(value || '')) ? String(value || '') : ''
+}
+
 function fillForm(settings) {
   el('baseUrl').value = settings.baseUrl || ''
   el('apiKey').value = settings.apiKey || ''
   el('mode').value = settings.mode || 'video'
-  el('quality').value = settings.quality || ''
+  fillQualityOptions(settings.quality || '')
   fillDestinationOptions(settings.destinationId || '')
   el('cookieProfileId').value = settings.cookieProfileId || ''
   el('updateCookies').checked = settings.updateCookies === true
