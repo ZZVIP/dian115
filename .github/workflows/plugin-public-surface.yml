@@ -21,12 +21,20 @@ jobs:
         run: node docs/plugin-platform/conformance/verify-public-surface.mjs
       - name: Validate public OpenAPI contract
         run: node docs/plugin-platform/conformance/openapi-check.mjs
+      - name: Validate runtime contract regression
+        run: node --test docs/plugin-platform/conformance/runtime-check.test.mjs
 
   plugin-example:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        example:
+          - complete-plugin
+          - douban-chart
     defaults:
       run:
-        working-directory: docs/plugin-platform/examples/complete-plugin
+        working-directory: docs/plugin-platform/examples/${{ matrix.example }}
     steps:
       - name: Checkout public tree
         uses: actions/checkout@v4
@@ -35,20 +43,21 @@ jobs:
         with:
           node-version: 20
           cache: npm
-          cache-dependency-path: docs/plugin-platform/examples/complete-plugin/package-lock.json
-      - name: Setup Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: '1.22.x'
+          cache-dependency-path: docs/plugin-platform/examples/${{ matrix.example }}/package-lock.json
+      # Checked before anything is built, so the published manifest, market
+      # template, permissions, schemas and cron rules are validated as shipped.
+      # The compiled module is not present here, so project-check stops before
+      # the build checks; see the note below for where the runtime is verified.
+      - name: Validate the published contract
+        run: node ../../conformance/project-check.mjs --manifest manifest.template.json --market market-entry.template.json
       - name: Install example dependencies
         run: npm ci
-      - name: Build Vue UI and Linux runtime
-        run: npm run build
-      - name: Validate manifest, market template, UI and runtime
-        run: npm run check
-      - name: Run public process-protocol smoke test
-        run: node ../../conformance/runtime-smoke.mjs --runtime build/runtime/plugin --manifest manifest.template.json --exercise-manifest --action send-test --expect-host-call --expect-telegram
-      - name: Build and sign a disposable package
-        run: npm run package -- --generate-key
-      - name: Validate generated market entry
-        run: node ../../conformance/project-check.mjs --manifest manifest.template.json --market releases/market-entry.generated.json --build-root build --require-build
+      - name: Build the Vue UI
+        run: npm run build:ui
+      # Compiling the runtime needs the TinyGo toolchain plus wasm-opt: a few
+      # hundred megabytes that upstream publishes no checksum for, on every docs
+      # change. The main repository's test suite builds both examples with that
+      # toolchain and runs them against the host, and project-check enforces the
+      # same toolchain and size rules on any package an author builds. Authors
+      # who want the full build locally run `npm run release` (see each
+      # example's README).
