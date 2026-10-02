@@ -11,7 +11,8 @@ test('rejects the released 180000 ms installation regression', () => {
   assert.throws(() => validateRuntime({ ...runtime, timeout_ms: 180000 }, schema), /runtime.timeout_ms must be between 100 and 120000/)
 })
 test('validates kind/protocol pairing and rejects unsupported runtime fields', () => {
-  assert.throws(() => validateRuntime({ ...runtime, protocol: 'dian115:process@1' }, schema), /protocol/)
+  assert.throws(() => validateRuntime({ ...runtime, kind: 'process', protocol: 'dian115:wasm@1' }, schema), /unsupported runtime.kind/)
+  assert.throws(() => validateRuntime({ ...runtime, protocol: 'dian115:wasm@2' }, schema), /protocol/)
   assert.throws(() => validateRuntime({ ...runtime, timeout_ms: 120000.5 }, schema), /integer/)
   assert.throws(() => validateRuntime({ ...runtime, action_path: '/action' }, schema), /unsupported/)
 })

@@ -12,7 +12,7 @@
     "url": "https://example.com/plugins"
   },
   "compatibility": {
-    "dian115": ">=3.8.51 <4.0.0",
+    "dian115": ">=3.8.51 <5.0.0",
     "plugin_api": "^2.0"
   },
   "runtime": {
@@ -75,6 +75,20 @@
     "files.changed",
     "telegram.callback"
   ],
+  "telegram": {
+    "commands": [
+      {
+        "command": "plugin_example",
+        "description": "打开完整插件示例"
+      }
+    ],
+    "keywords": [
+      {
+        "keyword": "完整插件示例",
+        "match": "exact"
+      }
+    ]
+  },
   "jobs": [
     {
       "id": "refresh",

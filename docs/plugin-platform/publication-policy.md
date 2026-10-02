@@ -56,7 +56,7 @@ node docs/plugin-platform/conformance/verify-public-surface.mjs
 
 1. [开发者指南](developer-guide.md)；
 2. [插件包格式](package-format-v1.md) 和三个 JSON Schema；
-3. [进程运行时协议](process-runtime-v1.md)；
+3. [WASM 运行时协议](wasm-runtime-v1.md)；
 4. [Host Call](host-call-v2.md) 和 [OpenAPI](openapi-v1.yaml)；
 5. [Vue Federation UI](ui-federation-v1.md)；
 6. [黑盒联调工具](conformance/README.md)。

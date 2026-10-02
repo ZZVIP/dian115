@@ -1,4 +1,4 @@
-module example.com/dian115-complete-plugin
+module example.com/dian115-douban-chart
 
 go 1.25.0
 

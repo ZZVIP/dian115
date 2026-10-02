@@ -6,9 +6,10 @@ import { dirname, join } from 'node:path'
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const output = join(root, 'build', 'runtime', 'plugin.wasm')
 mkdirSync(dirname(output), { recursive: true })
+
 // The host only accepts modules from a size-optimising toolchain: one module may
-// not exceed 512 KiB, and the Go standard compiler alone links in a runtime that
-// blows past that on its own. TinyGo compiles the same Go source without it.
+// not exceed 2 MiB, must not carry the Go standard runtime, and must not link
+// encoding/json. TinyGo compiles the same Go source without any of that.
 const tinygo = process.env.TINYGO || 'tinygo'
 const result = spawnSync(tinygo, ['build', '-target=wasi', '-buildmode=c-shared', '-opt=z', '-o', output, './runtime'], {
   cwd: root,

@@ -78,7 +78,7 @@ Fork [madbrolab/dian115](https://github.com/madbrolab/dian115) 仓库到你的�
 
 ### 4. 运行时披露说明
 
-**WASM 插件（推荐）：**
+**WASM 插件（唯一受支持的运行时）：**
 ```json
 "runtime": {
   "kind": "wasm",
@@ -88,17 +88,9 @@ Fork [madbrolab/dian115](https://github.com/madbrolab/dian115) 仓库到你的�
 }
 ```
 
-**Legacy Process 插件：**
-```json
-"runtime": {
-  "kind": "process",
-  "protocol": "dian115:process@1",
-  "autostart": true,
-  "trust_level": "isolated-process"
-}
-```
+原生进程运行时已经移除，`kind=process` 的市场条目会被拒绝。
 
-> `autostart=true` 表示启用插件后由宿主自动监管进程，不表示插件可以脱离宿主自行常驻。
+> `autostart=true` 表示启用插件后由宿主自动监管运行时，不表示插件可以脱离宿主自行常驻。
 
 ### 5. 提交 Pull Request
 
@@ -131,8 +123,7 @@ manifest.json      # 插件清单
 integrity.json     # 完整性清单
 signature.json     # Ed25519 签名
 frontend/dist/assets/remoteEntry.js  # Vue Federation 入口
-runtime/plugin.wasm  # WASM 运行时（推荐）
-# 或 runtime/plugin  # Legacy Process 运行时
+runtime/plugin.wasm  # WASM 运行时（唯一受支持）
 ```
 
 ### 签名要求
@@ -158,7 +149,7 @@ DIAN115 从市场拉取插件时会执行以下验证：
 - 验证 Manifest ID 和 Version 与市场条目一致
 - 验证完整性清单
 - 验证 Ed25519 签名
-- 验证运行时配置（WASM ABI 或静态 ELF）
+- 验证运行时配置（WASM ABI）
 
 ### 3. 权限验证阶段
 

@@ -1,7 +1,7 @@
 // Runtime validation from the public schema, with no host-source dependency.
 export function validateRuntime(runtime, schema) {
   if (!runtime || typeof runtime !== 'object' || Array.isArray(runtime)) throw new Error('runtime must be an object')
-  if (!['process', 'wasm'].includes(runtime.kind)) throw new Error('unsupported runtime.kind')
+  if (runtime.kind !== 'wasm') throw new Error('unsupported runtime.kind; only wasm is supported')
   const contract = schema.$defs?.[runtime.kind + 'Runtime']
   if (!contract?.properties) throw new Error('runtime schema is unavailable')
   for (const key of contract.required || []) {

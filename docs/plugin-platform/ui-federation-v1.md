@@ -108,7 +108,7 @@ export default defineConfig({
 ```ts
 export interface PluginRuntimeSummary {
   installation_id: number
-  runtime_kind: 'process' | string
+  runtime_kind: 'wasm' | string
   entry?: string
   timeout_ms: number
   background_timeout_ms?: number
@@ -173,7 +173,7 @@ const emit = defineEmits<{
 
 ### 3.2 `invokeAction(action, input)`
 
-调用 process 的 action。宿主生成 `inv_...` invocation ID，并附加当前浏览器 locale 和 IANA timezone。返回 wrapper：
+调用插件 runtime 的 action。宿主生成 `inv_...` invocation ID，并附加当前浏览器 locale 和 IANA timezone。返回 wrapper：
 
 ```json
 {
@@ -208,9 +208,9 @@ const emit = defineEmits<{
 - 提交表单、使用剪贴板等浏览器 API，并在用户手势中打开 HTTP/HTTPS 弹窗；
 - 使用同源页面能够访问的 DOM 和浏览器状态。
 
-这不是 UI 权限隔离边界。管理员安装插件即表示信任签名发布者提供的 UI 和 process runtime。插件不得把宿主浏览器状态、Cookie 或其他敏感数据发送到未获得管理员信任的目标。宿主不会通过 bridge 主动下发 Bot Token、115 Cookie、TMDB key、代理凭据或 CD2 凭据，但同源页面仍应被视为高信任代码。
+这不是 UI 权限隔离边界。管理员安装插件即表示信任签名发布者提供的 UI 和 runtime。插件不得把宿主浏览器状态、Cookie 或其他敏感数据发送到未获得管理员信任的目标。宿主不会通过 bridge 主动下发 Bot Token、115 Cookie、TMDB key、代理凭据或 CD2 凭据，但同源页面仍应被视为高信任代码。
 
-普通浏览器网络能力不会替代 Host Call：跨域请求仍受 CORS，HTTPS 管理页加载 HTTP 资源仍受 mixed-content 规则，浏览器请求也没有宿主代理优先、托管凭据、后台生命周期、安装实例审计或重试语义。需要这些能力时必须通过 `api.invokeAction` 进入 process，再由 `host.call` 请求。
+普通浏览器网络能力不会替代 Host Call：跨域请求仍受 CORS，HTTPS 管理页加载 HTTP 资源仍受 mixed-content 规则，浏览器请求也没有宿主代理优先、托管凭据、后台生命周期、安装实例审计或重试语义。需要这些能力时必须通过 `api.invokeAction` 进入插件 runtime，再由 `host.call` 请求。
 
 组件与宿主仍通过带随机 channel 的 `postMessage` bridge 执行 `getState`、`invokeAction`、`refresh` 和 `close`。宿主只接受来自当前 iframe window、正确 source 标识和 channel 的消息。普通 bridge 调用 30 秒超时；`invokeAction` 根据 Manifest `runtime.timeout_ms` 计算等待时间，至少等待 30 秒，再加 10 秒传输余量。Manifest 前台超时合法范围为 100–120000 毫秒，因此有效清单的 bridge 等待上限为 130 秒。管理端 310 秒的传输保护上限不代表清单可以声明 300 秒的前台超时。超时不代表写操作已撤销，应根据业务 ID 或重新查询状态核对，避免重复提交。iframe 高度由 `ResizeObserver` 上报并限制在 320-100000 px。
 

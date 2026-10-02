@@ -9,15 +9,13 @@
 ```text
 manifest.json
 frontend/dist/assets/remoteEntry.js
-runtime/plugin.wasm                 # WASM（推荐）
-# 或 runtime/plugin                 # legacy process，二选一
+runtime/plugin.wasm                 # WASM reactor
 integrity.json
 signature.json
 ```
 
-一个包只能声明一种运行时：`runtime.kind=wasm` 时必须提供 `runtime/plugin.wasm`，声明
-`runtime.kind=process` 时才提供 `runtime/plugin`。两者不能同时作为入口；legacy process
-仅用于兼容既有插件，新插件应选择 WASM。
+运行时必须是 `runtime.kind=wasm`，并且提供 `runtime/plugin.wasm`。原生进程运行时已经移除，
+`runtime.kind=process` 或 `runtime/plugin` 入口会被明确拒绝。
 
 可选文件包括 `frontend/icon.svg`、Federation 生成的其他 JS/CSS/字体和运行时所需的包内只读资源。
 
@@ -31,10 +29,12 @@ signature.json
 | ZIP 成员数 | 1024 |
 | `manifest.json`、`integrity.json`、`signature.json` | 各 256 KiB |
 | 完整性清单成员数 | 最多 1022 |
+| 编译后的 WASM 模块 | 2 MiB |
+| WASM 构建工具链 | 禁用 Go 标准编译器；用 TinyGo / Rust / Zig / C |
 
 成员路径必须是 NFC 规范化 UTF-8 包内相对路径，使用 `/`。禁止绝对路径、反斜杠、空段、`.`、`..`、重复 `/`、NUL、冒号、尾随点/空格和 Windows 设备名。大小写折叠后冲突的两个路径也会被拒绝。目录项不是必需的；只应打包普通文件。
 
-legacy `process` 的 `runtime.entry` 必须包含执行位，并校验为当前 Linux 架构的静态 ELF。`wasm` 的入口是普通 `.wasm` 文件，校验 WASM magic、导出内存和 `dian115_alloc`/`dian115_handle` ABI；WASM 不需要执行位，也不要求 Linux 架构匹配。
+`runtime.entry` 是普通 `.wasm` 文件，校验 WASM magic、导出内存和 `dian115_alloc`/`dian115_handle` ABI；WASM 不需要执行位，也不要求 Linux 架构匹配。宿主会拒绝由 Go 标准编译器构建的模块——它会把完整的 Go 运行时链进模块，实测每个插件启动即提交 8 MiB 线性内存，而 TinyGo 构建同样源码只提交 256 KiB。构建方法见 [developer-guide.md](developer-guide.md)。
 
 ## 2. `manifest.json`
 
@@ -150,7 +150,7 @@ ui
 
 ### 2.3 运行时
 
-`runtime.kind` 为 `wasm`（推荐）或 legacy `process`。对应协议分别是 `dian115:wasm@1` 与 `dian115:process@1`。`entry` 是完整性覆盖的包内相对路径。
+`runtime.kind` 必须为 `wasm`，对应协议 `dian115:wasm@1`。原生进程运行时已移除；`kind: process` 的包会被宿主明确拒绝。`entry` 是完整性覆盖的包内相对路径。
 
 WASM runtime 的 ABI、Host imports、配额和生命周期见 [WASM runtime v1](wasm-runtime-v1.md)。WASM 不得声明 `abi`、`health_path`、`event_path`、`action_path`、`state_path` 或 `job_path`；可选的 `memory_mb` 范围为 4–512 MiB。
 
@@ -161,9 +161,12 @@ WASM runtime 的 ABI、Host imports、配额和生命周期见 [WASM runtime v1]
 | `timeout_ms` | 30000 | 100-120000 |
 | `background_timeout_ms` | 300000 | 1000-3600000 |
 | `max_concurrency` | 4 | 1-16 |
+| `memory_mb` | 64 | 4-512 |
 | `restart_policy` | `on-failure` | 仅此值 |
 
-不得提交旧运行时字段，如 `abi`、`memory_mb`、`health_path`、`event_path`、`action_path`、`state_path`、`job_path`。解码器拒绝未知字段。
+`memory_mb` 是模块线性内存的硬上限，默认 64 MiB、范围 4–512 MiB。超过上限的分配会失败并按调用错误处理；宿主自身的其余内存不受影响。
+
+不得提交旧运行时字段，如 `abi`、`health_path`、`event_path`、`action_path`、`state_path`、`job_path`。解码器拒绝未知字段。
 
 ### 2.4 权限
 
@@ -216,7 +219,9 @@ UI 加载失败只显示错误状态与重试，不会切换到其他 UI 协议�
 
 ### 2.6 事件与任务
 
-`events` 可选，最多 64 个不重复 topic。topic 长度 3-80，只能由字母/数字段和 `.`、`_`、`-` 分隔符组成。目录监控的 `event_topic` 必须出现在这里。`telegram.message` 是运行时注册产生的专用通道，不需要写入 `events`。
+`events` 可选，最多 64 个不重复 topic。topic 长度 3-80，只能由字母/数字段和 `.`、`_`、`-` 分隔符组成。目录监控的 `event_topic` 必须出现在这里。`telegram.message` 由 `telegram` 声明产生，不需要写入 `events`。
+
+`telegram` 可选，声明宿主提前登记的消息路由，使宿主无需加载插件即可完成匹配：`commands` 最多 3 项（`command` 为小写字母开头的标识符，可带 `description`），`keywords` 最多 3 项（`keyword` 加 `match`，取值 `exact`、`prefix`、`contains`，默认 `exact`）。命令名不能与宿主内置命令冲突，也不能与其他插件重复。运行时调用 `host.telegram.register` 会被拒绝，请改用这里的声明。
 
 `jobs` 可选，最多 32 项。每项的 `id` 和 `handler` 必须唯一；`id` 使用小写事件标识格式，`handler` 最多 128 个字母、数字、点、下划线或连字符。`allow_overlap` 默认 `false`。
 
@@ -312,10 +317,10 @@ RFC8785-JCS(parse(integrity.json))
       "package_url": "https://example.com/releases/example.complete-plugin-1.0.0.d115p",
       "sha256": "PACKAGE_FILE_SHA256_LOWERCASE_HEX",
       "runtime": {
-        "kind": "process",
-        "protocol": "dian115:process@1",
+        "kind": "wasm",
+        "protocol": "dian115:wasm@1",
         "autostart": true,
-        "trust_level": "isolated-process"
+        "trust_level": "wasm-sandbox"
       },
       "permissions": {
         "apis": [],
@@ -329,6 +334,8 @@ RFC8785-JCS(parse(integrity.json))
 
 `package_url` 和 `icon_url` 可使用相对索引最终 URL 的相对引用，也可使用绝对 HTTPS URL。索引最多 2 MiB、1000 个插件版本项。同一 `id@version` 不能重复。
 
+市场条目里的 `runtime.autostart` 恒为 `true`，它是一句**固定披露**而不是每个插件的开关：当前只有 WASM 一种运行时，宿主要么自己托管它，要么不装。它的含义是"运行时机由宿主决定"——宿主在有活时加载模块、空闲时释放它，插件作者和安装者都不需要在别处再启动一个服务。声明为 `resident: true` 的常驻插件同样由宿主托管，只是不参与闲置释放。细节见 [WASM runtime v1](wasm-runtime-v1.md)。
+
 安装前会下载包并核对 `sha256`，然后比较：
 
 - 索引 `id` / `version` 与 Manifest；
@@ -339,15 +346,15 @@ RFC8785-JCS(parse(integrity.json))
 
 ## 6. 安装、更新和回滚语义
 
-安装器先完成 ZIP、JSON、签名、完整性、Manifest、权限、UI 和运行时检查；legacy process 额外检查 ELF 架构和静态链接，WASM 检查模块 ABI，再提交安装记录和文件。权限或运行时披露变化会生成新的同意摘要，管理员必须重新确认。
+安装器先完成 ZIP、JSON、签名、完整性、Manifest、权限、UI 和运行时检查；WASM 模块还要通过 ABI 校验，然后才提交安装记录和文件。权限或运行时披露变化会生成新的同意摘要，管理员必须重新确认。
 
-插件文件统一保存在 `/config/package/<plugin-id>/`：签名版本包位于 `package/`，插件持久数据位于 `data/`，私有临时文件位于 `tmp/`。进程启动后只看到自己的这三个目录。更新保留 `data/`，先停止旧进程，再短暂打开只读 package 父目录并原子写入新版本；数据库提交失败会删除新版本并重新协调旧版本。若新进程 `runtime.initialize` 失败，新版本保持已安装并进入不健康、退避或失败状态；宿主不会自动恢复旧包。发布者应在发布前验证目标架构，并保留旧版本包供管理员显式降级。
+插件文件统一保存在 `/config/package/<plugin-id>/`：签名版本包位于 `package/`，插件持久数据位于 `data/`，私有临时文件位于 `tmp/`。WASM 模块只读挂载自己的 `package/`，其余目录不可见；持久数据通过 Host Storage 保存。更新保留 `data/`，先卸载旧模块，再原子写入新版本；数据库提交失败会删除新版本并重新协调旧版本。若新模块 `runtime.initialize` 失败，新版本保持已安装并进入不健康、退避或失败状态；宿主不会自动恢复旧包。发布者应保留旧版本包供管理员显式降级。
 
-禁用会停止新调用、任务和事件，注销 Telegram 路由并停止运行时 worker。卸载会删除该插件的整个 `/config/package/<plugin-id>/` 私有目录（包括 `package`、`data`、`tmp`）和安装记录；安装实例级 KV 的保留/删除以当前管理端卸载提示为准。插件不能自行读取其他安装的数据。
+禁用会停止新调用、任务和事件，注销 Telegram 路由并卸载运行时模块。卸载会删除该插件的整个 `/config/package/<plugin-id>/` 私有目录（包括 `package`、`data`、`tmp`）和安装记录；安装实例级 KV 的保留/删除以当前管理端卸载提示为准。插件不能自行读取其他安装的数据。
 
 ### 本地导入
 
-管理员也可以在插件中心直接选择本地 `.d115p` 文件。宿主先把文件放入受控临时目录，执行与市场安装完全相同的 ZIP、Manifest、完整性、签名、权限、Federation UI、静态 ELF 和运行时检查，再返回短期导入令牌供管理员查看权限。
+管理员也可以在插件中心直接选择本地 `.d115p` 文件。宿主先把文件放入受控临时目录，执行与市场安装完全相同的 ZIP、Manifest、完整性、签名、权限、Federation UI 和 WASM 运行时检查，再返回短期导入令牌供管理员查看权限。
 
 确认安装时，宿主会再次验证令牌有效期、包 SHA-256、`consent_digest` 和包内容，然后复用同一异步安装、替换和回滚流程。令牌 15 分钟后过期且只能使用一次；成功、失败、取消或过期都会清理暂存包。本地导入不会创建市场条目，也不会绕过任何权限确认；安装记录的来源名称为“本地导入”。
 

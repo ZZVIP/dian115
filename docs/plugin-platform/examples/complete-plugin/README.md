@@ -6,20 +6,22 @@
 - 宿主 singleton 的 Vue 3、Naive UI 和 `@lucide/vue`；
 - `dian115-theme-v1` 主题变量；
 - Go WASM reactor runtime（`dian115:wasm@1`）；
-- 全双工 `Content-Length` JSON-RPC；
+- reactor ABI 上的 JSON-RPC 调用封套（`dian115_alloc`/`dian115_handle`）；
 - `runtime.initialize`、state、action、job、普通 event、Telegram event 和 shutdown；
 - `host.call` 发送插件通知、读写 Host Storage、访问本地 HTTP 服务和创建目录监控；
-- 初始化时动态注册 1 个 Telegram 命令和 1 个关键词；示例遵守每个插件最多 3 个命令和 3 个关键词；
+- 在 manifest 的 `telegram` 段声明 1 个命令和 1 个关键词（最多各 3 个）。宿主在安装时登记路由，所以插件未加载时也能匹配消息；
 - 常驻模块模式（`runtime.resident`）：第二个模块实例运行不限时的 `resident` 主循环，定时把心跳写入 Host Storage，并在启动时发送带回调按钮的通知；
 - Telegram 回调按钮：通知和回复按钮携带 `callback_data`，点击后以 `telegram.callback` 事件回到插件，插件用 `answer`/`alert`/`reply` 应答并可持续多轮交互；
 - 用户点击触发的 `window.open()` 外部弹窗、图片渲染和浏览器存储；
-- 生成完整性清单、Ed25519 签名、正确 ZIP 执行位、包 SHA-256 和市场条目。
+- 生成完整性清单、Ed25519 签名、包 SHA-256 和市场条目。
 
 ## 前置条件
 
 - Node.js 20+
 - npm
-- Go 1.22+
+- TinyGo 0.4x，以及 `wasm-opt`（Binaryen）在 `PATH` 上或通过 `WASMOPT` 指定
+
+宿主不接受 Go 标准编译器构建的模块，也拒绝链接 `encoding/json` 的模块：runtime 使用本目录自带的 `pluginjson` 做字段级读写。
 
 WASM runtime 与宿主 CPU 架构无关；构建机可以是 Windows、macOS 或 Linux。
 
@@ -39,20 +41,7 @@ npm run dev
 
 预览入口提供与宿主一致的 Naive UI Provider 和主题变量，并使用本地 mock bridge；正式包仍通过 Federation 加载 `./AppPage`。
 
-示例页必须由宿主提供的 Vue 3、Naive UI 和 `@lucide/vue` singleton 渲染。插件 UI 可以使用普通浏览器 `fetch`，但它受 CORS、混合内容和页面生命周期约束；需要宿主代理、托管凭据、后台运行、审计或稳定重试的业务请求应调用 action 进入进程，再由 `host.call` 访问宿主或外部服务。
-
-默认架构跟随当前 Node 架构，非 ARM64 默认生成 `amd64`。显式选择：
-
-```bash
-DIAN115_PLUGIN_GOARCH=arm64 npm run build:runtime
-```
-
-PowerShell：
-
-```powershell
-$env:DIAN115_PLUGIN_GOARCH = 'arm64'
-npm run build:runtime
-```
+示例页必须由宿主提供的 Vue 3、Naive UI 和 `@lucide/vue` singleton 渲染。插件 UI 可以使用普通浏览器 `fetch`，但它受 CORS、混合内容和页面生命周期约束；需要宿主代理、托管凭据、后台运行、审计或稳定重试的业务请求应调用 action 进入插件 runtime，再由 `host.call` 访问宿主或外部服务。
 
 UI 输出到 `build/frontend/dist/assets`，runtime 输出到 `build/runtime/plugin.wasm`。构包脚本会再次检查 WASM magic、ABI 和完整性。
 
@@ -62,7 +51,7 @@ UI 输出到 `build/frontend/dist/assets`，runtime 输出到 `build/runtime/plu
 node ../../conformance/project-check.mjs --manifest manifest.template.json --market market-entry.template.json --build-root build --require-build
 ```
 
-该检查只使用公开 schema 和 Node.js 标准库，不读取主项目源码、数据库、配置或 Docker 构建上下文。WASM worker 的 Host Call、配额和取消语义由宿主集成测试验证。
+该检查只使用公开 schema 和 Node.js 标准库，不读取主项目源码、数据库、配置或 Docker 构建上下文。WASM 运行时的 Host Call、配额和取消语义由宿主集成测试验证。
 
 ## 首次本地签名
 

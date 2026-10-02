@@ -1,6 +1,6 @@
 # DIAN115 Host Call v2
 
-`host.call` 是 WASM 和兼容 process 插件的网络与宿主业务入口。WASM 使用 `dian115.host_call` / `host_read` 导入承载下述业务请求，外层封装见 [WASM 协议](wasm-runtime-v1.md)。它同时承载：
+`host.call` 是 WASM 插件的网络与宿主业务入口。WASM 使用 `dian115.host_call` / `host_read` 导入承载下述业务请求，外层封装见 [WASM 协议](wasm-runtime-v1.md)。它同时承载：
 
 - 安装时批准的 DIAN115 本地 Host API；
 - 任意 HTTP/HTTPS 网站或本地服务请求。
@@ -193,7 +193,7 @@ GET /api/plugin-host/emby/items/:id
 - 禁止 URL userinfo 和 fragment；
 - 只支持 `GET`、`HEAD`、`POST`、`PUT`、`PATCH`、`DELETE`；
 - HTTPS 使用 TLS 最低 1.2、证书、SNI 和 hostname 正常校验；HTTP 不提供加密或证书保护，插件应只把 HTTP 用于本地/受信任网络或本身不含秘密的接口；
-- 默认总超时 10 秒；process `host.call` 不提供自定义超时字段；
+- 默认总超时 10 秒；`host.call` 不提供自定义超时字段；
 - 最多跟随 3 次跳转，每次重新校验 URL、DNS、目标地址和代理规则；跳转仍只能到 HTTP/HTTPS；
 - `301/302` 的 POST 和 `303` 会转为 GET 并丢弃 body；
 - 响应正文最多 8 MiB；极端超大响应会在 8 MiB 处截断并返回 `x-dian115-body-truncated: true`，常规列表应使用上游分页参数；
@@ -233,7 +233,7 @@ Broker 失败返回 HTTP 语义的 `502` Host Call result，body 为脱敏 JSON�
 
 HTTP 明文请求可能被同机或同网段观察或篡改；插件不要把密码、Token 或托管凭据发送到不受信任的 HTTP 地址。HTTPS 仍建议用于互联网服务。
 
-插件进程的 `socket`、`connect`、`bind`、`listen`、`accept`、send/receive 和 socket option 系统调用由 seccomp 拒绝，因此不能用自己的 DNS/HTTP 客户端绕过 Broker。
+WASM 模块没有 Socket 能力，也不能创建子进程，因此不能用自己的 DNS/HTTP 客户端绕过 Broker。
 
 ## 5. 代理优先级
 

@@ -1,6 +1,6 @@
 # DIAN115 WASM runtime v1
 
-插件包可以声明 `runtime.kind: "wasm"` 与 `runtime.protocol: "dian115:wasm@1"`。宿主在 DIAN115 容器内使用 wazero interpreter 托管模块。模块没有宿主文件描述符、Socket、命令执行、环境密钥或预打开的宿主目录；需要文件、网络、通知、Telegram、状态和调度能力时，必须调用 Host API Broker。
+插件包可以声明 `runtime.kind: "wasm"` 与 `runtime.protocol: "dian115:wasm@1"`。宿主在 DIAN115 容器内使用 wazero 托管模块，**只使用编译引擎**，没有解释器后备：同一段插件逻辑在任何部署上开销一致，不会因为宿主环境不同而慢一个数量级。宿主平台若无法运行编译引擎，加载插件会直接失败并给出明确原因，而不是悄悄降级。**每个插件使用自己的编译缓存**，插件被释放时缓存一起关闭——这是"空闲插件不占内存"能成立的前提；编译结果同时落盘，被释放的插件再次加载时读缓存而不是重新编译。模块没有宿主文件描述符、Socket、命令执行、环境密钥或预打开的宿主目录；需要文件、网络、通知、Telegram、状态和调度能力时，必须调用 Host API Broker。
 
 ## 模块 ABI
 
@@ -43,11 +43,30 @@ Action 的业务结果 `status` 仅允许 `succeeded`、`failed`、`accepted` �
 
 `memory_mb`（4–512 MiB）、`timeout_ms`（100–120000 毫秒）、`background_timeout_ms`（1000–3600000 毫秒）、`max_concurrency`（1–16）由 manifest 声明。`startup_timeout_ms` 和 `shutdown_timeout_ms` 均为 1000–60000 毫秒。前台 action 超时上限为 120 秒，后台 job 可单独设置更长预算；不要将后台预算写入 `timeout_ms`。越界清单会在安装时被拒绝，构包前应运行 `conformance/project-check.mjs`。
 
-超时会取消 guest context。单次调用失败（包括 guest trap、非法 host 请求和无效响应封套）只向该次调用返回错误，不会终止 worker；只有连续 8 次调用失败才判定模块状态损坏并交给监督器按 `restart_policy: on-failure` 重启。空闲实例还会收到 `runtime.ping` 活性探测，由 worker 直接应答，插件无需实现。永久性的启动失败（入口缺失、ABI 不支持、拒绝初始化）不消耗重启预算；彻底失败的实例冷却 30 分钟后会自动获得一次新的重试机会。关闭时先发送 `runtime.shutdown`，超时后终止 worker。WASM worker 只读挂载插件 package，持久化数据通过 Host Storage 保存。
+## 构建要求
+
+宿主只接受用低占用工具链构建的模块：**Go 标准编译器被拒绝**，TinyGo / Rust / Zig / C 均可。原因是运行占用而不是审美——用同一份示例源码实测：
+
+| 构建方式 | 模块体积 | 启动后提交的线性内存 |
+| --- | --- | --- |
+| Go 标准编译器（wasip1，`-s -w`） | 3.3 MiB | 8 MiB |
+| TinyGo（`-target=wasi -buildmode=c-shared -opt=z`） | 0.6 MiB | 512 KiB |
+
+被拒绝的模块会在安装和打包阶段给出点名原因，不会只说"超限"。除此之外还有 2 MiB 的兜底上限，防止非 Go 但同样过大的模块混进来。TinyGo 需要 `wasm-opt`（Binaryen）在 `PATH` 上，或通过 `WASMOPT` 指定。
+
+**插件协议同时禁止链接 `encoding/json`。** 宿主会一直保留已加载插件的编译产物，所以一个重标准库的代价会乘到整个插件清单上：同一份示例源码用 `encoding/json` 时模块 1.4 MiB、每个加载中插件约 8 MiB，改用示例 SDK 里的 [pluginjson](examples/sdk/pluginjson/pluginjson.go) 做字段级读写后是 0.6 MiB / 3.5 MiB。宿主和 `project-check.mjs` 都会扫描模块并**按名字点名拒绝**，作者拿到的是"你链接了 encoding/json，请改用 pluginjson"，而不是一个体积超限。这项检查是开发者体验规则，不是安全边界；2 MiB 的兜底上限依然生效。TinyGo 需要 `wasm-opt`（Binaryen）在 `PATH` 上，或通过 `WASMOPT` 指定。
+
+超时会取消 guest context。单次调用失败（包括 guest trap、非法 host 请求和无效响应封套）只向该次调用返回错误，不会终止模块；只有连续 8 次调用失败才判定模块状态损坏并交给监督器按 `restart_policy: on-failure` 重启。模块默认加载在宿主进程内，不再为每个插件启动独立进程；宿主按需加载模块，并在长时间无人调用（默认 15 分钟）后释放它，下一次调用会自动重新加载，因此插件不应把“进程一直存在”当作前提。
+
+**不要依赖"进程一直在"来维持状态。** 定时 job、声明的事件订阅、文件监控和 Telegram 路由都由宿主持久化并驱动：到点、事件到达或消息匹配时，宿主才加载插件、调用、然后释放。所以这些插件都不需要常驻，宿主的插件内存占用跟着"同时活跃多少个"走，而不是"装了多少个"。**唯一**必须常驻的是声明了 `resident: true` 的插件——它自己在模块里跑后台循环，宿主无法在它没加载时替它做任何事。
+
+宿主对加载和回收有四个可调项，默认值适用于大多数部署：同时加载的插件数量上限 `DIAN115_PLUGIN_WASM_MAX_LOADED`（默认 16，超出按最久未使用释放，设为 `0` 表示不限制）；模块编译的并发上限 `DIAN115_PLUGIN_WASM_MAX_LOADS`（默认 4）；插件被调用过之后多久释放 `DIAN115_PLUGIN_WASM_IDLE_TIMEOUT`（默认 15 分钟，设为 `0` 表示永不释放）；开机预热过但一次都没被调用的插件多久释放 `DIAN115_PLUGIN_WASM_UNUSED_TIMEOUT`（默认 2 分钟）。编译结果按内容缓存在数据库同目录的 `plugin-compiled/` 下（wazero 自己再按版本和架构分子目录），所以被释放的插件再次被用到时是读缓存而不是重新编译：实测示例模块的重新加载从约 117 毫秒降到约 40 毫秒。该目录只影响加载速度，服务停止时可以安全删除。
+
+空闲实例还会收到 `runtime.ping` 活性探测，由宿主直接应答，插件无需实现。永久性的启动失败（入口缺失、ABI 不支持、拒绝初始化）不消耗重启预算；彻底失败的实例冷却 30 分钟后会自动获得一次新的重试机会。关闭时先发送 `runtime.shutdown`，超时后卸载模块。模块只读挂载插件 package，持久化数据通过 Host Storage 保存。
 
 ## Telegram 入站消息
 
-插件在初始化时调用 `host.telegram.register` 注册最多 3 个命令和 3 个关键词。宿主先处理内置命令和已识别的链接，剩余文本按注册路由匹配一个插件，然后发送 `telegram.message` 事件。事件只包含 `update_id`、`date`、`message_id`、`message_thread_id`、`chat_id`、`chat_type`、`user_id` 和文本，以及脱敏的匹配信息；Bot Token、原始 Update、用户名和附件不会进入插件。插件可返回纯文本或 HTML 回复、HTTPS 图片和受限按钮。按钮支持 `url` 或 `callback_data`（二选一）；携带 `callback_data` 的按钮被点击后，宿主向该安装实例投递 `telegram.callback` 事件，插件以 `answer`/`alert`/`reply` 应答，详见 host-call-v2.md 第 12 节。
+插件在 manifest 的 `telegram` 段声明最多 3 个命令和 3 个关键词；宿主在安装和启用时登记这些路由，**不需要加载插件**。运行时注册（`host.telegram.register`）已不再支持。宿主先处理内置命令和已识别的链接，剩余文本按声明的路由匹配一个插件，然后按需加载该插件并发送 `telegram.message` 事件。事件只包含 `update_id`、`date`、`message_id`、`message_thread_id`、`chat_id`、`chat_type`、`user_id` 和文本，以及脱敏的匹配信息；Bot Token、原始 Update、用户名和附件不会进入插件。插件可返回纯文本或 HTML 回复、HTTPS 图片和受限按钮。按钮支持 `url` 或 `callback_data`（二选一）；携带 `callback_data` 的按钮被点击后，宿主向该安装实例投递 `telegram.callback` 事件，插件以 `answer`/`alert`/`reply` 应答，详见 host-call-v2.md 第 12 节。
 
 当前公开的入站交互渠道是 Telegram。`/api/notifications/plugin` 是插件发起的出站通知接口，不会把系统通知伪装成用户入站消息；新增渠道必须先定义独立的脱敏事件投影、身份范围、幂等键和回复校验。
 
@@ -57,12 +76,12 @@ manifest 中的 `permissions.network` 是安装时的用途和代理偏好说明
 
 ## 常驻模块（resident）
 
-manifest 声明 `"runtime": {"kind": "wasm", "resident": true}` 后，worker 会在服务模块之外用同一编译产物实例化第二个模块，并向它发起一次不限时的后台调用：
+manifest 声明 `"runtime": {"kind": "wasm", "resident": true}` 后，宿主会在服务模块之外用同一编译产物实例化第二个模块，并向它发起一次不限时的后台调用：
 
 ```json
 {"op": "resident", "invocation_id": "resident", "payload": {}}
 ```
 
-插件在这个调用里运行自己的主循环（定时器、轮询、长驻任务），通过 `host_call`/`host_read` 正常使用全部宿主能力，行为等同本机常驻模块，而不是"用户点击才运行"的沙箱。常驻调用返回错误视为崩溃，worker 退出并由监督器按 `restart_policy` 重启；正常返回只结束常驻循环，服务模块继续应答普通调用。进程插件本身已是长驻进程，不需要也不允许该字段。
+插件在这个调用里运行自己的主循环（定时器、轮询、长驻任务），通过 `host_call`/`host_read` 正常使用全部宿主能力，行为等同本机常驻模块，而不是"用户点击才运行"的沙箱。常驻调用返回错误视为崩溃，整个运行时被卸载并由监督器按 `restart_policy` 重启；正常返回只结束常驻循环，服务模块继续应答普通调用。常驻插件不会被空闲释放。
 
 宿主调用状态按模块实例隔离，常驻模块与服务模块可以并发发起 `host_call`，互不干扰。

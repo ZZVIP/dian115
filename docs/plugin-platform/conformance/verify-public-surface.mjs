@@ -37,6 +37,7 @@ const obsoleteContractPatterns = [
   { pattern: /(?:declarative\s+UI|声明式\s*UI)/i, label: 'removed declarative UI model' },
   { pattern: /\/api\/pt\//i, label: 'removed PT plugin route' },
   { pattern: /[?&]query=Dune\b/, label: 'obsolete TMDB search parameter' },
+  { pattern: /dian115:process@1|isolated-process/, label: 'removed native-process plugin runtime' },
 ]
 const contentViolations = []
 for (const file of publicContractFiles) {
@@ -47,6 +48,10 @@ for (const file of publicContractFiles) {
   try {
     content = readFileSync(file, 'utf8')
   } catch (error) {
+    // A file deleted in the working tree is still reported by `git ls-files`
+    // until the deletion is staged; treat it as gone instead of failing the
+    // public-surface check on an unreadable path.
+    if (error?.code === 'ENOENT') continue
     contentViolations.push(`${file}: cannot read public contract file (${error?.message || error})`)
     continue
   }

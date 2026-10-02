@@ -49,10 +49,13 @@
       "additionalProperties": false,
       "required": ["kind", "protocol", "autostart", "trust_level"],
       "properties": {
-        "kind": { "enum": ["process", "wasm"] },
-        "protocol": { "enum": ["dian115:process@1", "dian115:wasm@1"] },
-        "autostart": { "type": "boolean" },
-        "trust_level": { "enum": ["isolated-process", "wasm-sandbox"] }
+        "kind": { "enum": ["wasm"] },
+        "protocol": { "enum": ["dian115:wasm@1"] },
+        "autostart": {
+          "type": "boolean",
+          "description": "固定披露，恒为 true：运行时机由宿主决定（有活时加载、空闲时释放），安装者不需要另外运行任何服务。它不是每个插件的开关。"
+        },
+        "trust_level": { "enum": ["wasm-sandbox"] }
       },
       "allOf": [{
         "properties": {

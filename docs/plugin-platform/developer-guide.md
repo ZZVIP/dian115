@@ -4,23 +4,21 @@ This guide takes a plugin from source to an installable package. It is self-cont
 
 ## 1. Architecture
 
-A plugin has one supervised local runtime (WASM recommended; legacy Linux process remains supported) and one mandatory Vue page:
+A plugin has one supervised WASM runtime and one mandatory Vue page:
 
 ```text
 Vue Federation page (trusted same-origin iframe)
   -> getState / invokeAction
   -> DIAN115 runtime bridge
-  -> runtime.invoke over framed JSON-RPC
-  -> plugin WASM reactor (or legacy process)
+  -> runtime.invoke envelope over the reactor ABI
+  -> plugin WASM reactor
   -> host.call
   -> approved DIAN115 handler or host HTTP/HTTPS Broker
 ```
 
 The page is signed publisher code loaded in an iframe with a host bridge. It can use normal browser features, including images, `localStorage`, `sessionStorage`, IndexedDB, popups and ordinary `fetch`/XHR requests. It can also access same-origin browser state, so installing a plugin means trusting its publisher. The page is never given raw Bot, 115, TMDB, proxy or CD2 credentials by the plugin bridge, and it has no direct filesystem access. Privileged and background work should stay in the local runtime so it remains covered by plugin permissions, audit, proxy and retry behavior.
 
-The local runtime is started directly by the main service in the current Docker container. It must not listen on a port, create another plugin container, daemonize, or require a remote callback. WASM modules do not receive a filesystem mount or start helper processes. Legacy process packages use the private `/config/package/<plugin-id>/` root and inherit the seccomp/no-new-privileges policy. Host files, watches, network, Telegram and notifications remain mediated by approved Host APIs.
-
-To start a helper shipped in the package, execute it below the path in `DIAN115_PLUGIN_PACKAGE`, for example `$DIAN115_PLUGIN_PACKAGE/runtime/helper`. It must be a static Linux ELF and remain inside the package directory. Helpers inherit the same private root and are terminated with the main plugin process group.
+The WASM runtime is loaded directly by the main service in the current Docker container. It cannot listen on a port, create another plugin container, daemonize, require a remote callback, or start helper processes. The module receives no host filesystem mount beyond its own read-only package, no sockets, no credentials and no environment secrets. Host files, watches, network, Telegram and notifications remain mediated by approved Host APIs.
 
 ## 2. Start from the complete sample
 
@@ -43,13 +41,44 @@ naive-ui
 
 They must be Federation singletons with `generate: false`. Do not bundle a private copy. The package must expose the module named by `ui.federation.module`, normally `./AppPage`.
 
-For the recommended WASM runtime, build a reactor module:
+The runtime must be a reactor module built with a size-optimising toolchain. The
+Go standard compiler is not accepted: it links the complete Go runtime into the
+module, which puts every module far above the host budget and makes each plugin
+pay for a runtime it does not need. Use TinyGo for Go sources, or Rust, Zig or C:
 
 ```bash
-CGO_ENABLED=0 GOOS=wasip1 GOARCH=wasm go build -buildmode=c-shared -trimpath -ldflags="-s -w" -o build/runtime/plugin.wasm ./runtime
+tinygo build -target=wasi -buildmode=c-shared -opt=z -o build/runtime/plugin.wasm ./runtime
 ```
 
-WASM is architecture independent. Legacy process packages use `GOARCH=amd64` or `arm64`; a ZIP with an ELF `PT_INTERP` segment is rejected.
+TinyGo needs `wasm-opt` from Binaryen on `PATH` (or the `WASMOPT` environment
+variable pointing at it). Rust, Zig and C are equally accepted as long as the
+module keeps the ABI in `wasm-runtime-v1.md`; a `no_std` / `no_alloc` build with
+`-Oz` typically lands in the same size range.
+
+The host refuses any module that carries the Go standard runtime, and names
+that cause in the packaging error. A **2 MiB** ceiling backs it up for modules
+that are not recognisably Go but are still far larger than a plugin should be.
+The shipped example is ~0.6 MiB with TinyGo and ~3.4 MiB with the standard
+compiler, so the difference is visible immediately. WASM is architecture
+independent; no target-architecture build is required.
+
+The protocol also refuses modules that link `encoding/json`, again by name. The
+host keeps a loaded plugin's compiled code, so one heavy package is paid for by
+every plugin; the reference runtime includes
+[`pluginjson`](examples/sdk/pluginjson/pluginjson.go), which
+reads the fields a plugin needs without decoding whole documents. Use it (or its
+equivalent in your language) instead of a general JSON library:
+
+```go
+method := pluginjson.Text(pluginjson.Field(request, "method"))
+params := pluginjson.Field(request, "params")
+```
+
+Both rules are checked by `conformance/project-check.mjs`, so packaging fails
+before installation does. They are developer-experience rules rather than a
+security boundary: they keep the catalogue's footprint predictable, and an
+author who genuinely needs the standard library should say so rather than work
+around the check.
 
 ## 3. Define the signed Manifest
 
@@ -114,7 +143,7 @@ The UI and runtime are both required:
 }
 ```
 
-Only declare local APIs the process actually calls. Every `(method, path template)` must appear in [OpenAPI](openapi-v1.yaml). Paths are exact; declaring one parameter route does not authorize a static sibling. Write methods require an `Idempotency-Key` between 16 and 128 printable ASCII characters unless the endpoint's OpenAPI operation says it owns an equivalent idempotency mechanism.
+Only declare local APIs the runtime actually calls. Every `(method, path template)` must appear in [OpenAPI](openapi-v1.yaml). Paths are exact; declaring one parameter route does not authorize a static sibling. Write methods require an `Idempotency-Key` between 16 and 128 printable ASCII characters unless the endpoint's OpenAPI operation says it owns an equivalent idempotency mechanism.
 
 Three optional declaration refinements:
 
@@ -132,44 +161,40 @@ The host rule always wins. An undeclared origin/method uses `system`.
 
 See [Package format v1](package-format-v1.md) for every field and cross-file rule.
 
-## 4. Implement the runtime protocol\n\nWASM plugins use the reactor ABI and broker imports described in [WASM runtime v1](wasm-runtime-v1.md). Legacy process plugins use the framed protocol below.
+## 4. Implement the runtime protocol
 
-A legacy process reads and writes `Content-Length` framed JSON-RPC 2.0 on stdin/stdout. The channel is full duplex: while handling `runtime.invoke`, the process may send `host.call`, `host.log`, or a Telegram registration and wait for the response. Keep reading stdout responses concurrently or both sides can deadlock.
+WASM plugins use the reactor ABI and broker imports described in [WASM runtime v1](wasm-runtime-v1.md). The module exports `dian115_alloc` and `dian115_handle`, and may import `dian115.host_call` / `dian115.host_read` (or the `wasi_snapshot_preview1` functions the standalone Go runtime needs).
 
 The host calls:
 
-- `runtime.initialize` once after every process start;
+- `runtime.initialize` once after every module load;
 - `runtime.invoke` with `op=state`, `action`, `job`, or `event`;
-- `runtime.shutdown` before an intentional stop.
+- `runtime.ping` for idle liveness; the host answers this probe itself, so the guest does not need to implement it;
+- `runtime.shutdown` before an intentional unload.
 
 The runtime can call:
 
 - `host.call` for approved local APIs or external HTTP/HTTPS services;
 - `host.log` for structured installation-scoped logs;
 - `host.ui.invalidate` to request a state refresh;
-- `host.telegram.register`, `host.telegram.list`, and `host.telegram.unregister`.
+- `host.telegram.list` to read the routes the manifest declared. Telegram routes
+  are **not** registered at runtime any more: `host.telegram.register` and
+  `host.telegram.unregister` are rejected, and a plugin that needs Telegram
+  declares its routes in the manifest instead (see below).
 
-The precise frames, payloads, response status enums, ETag requirements, retries and error codes are in [Process runtime v1](process-runtime-v1.md). Do not return an arbitrary JSON object for `state`, `action`, or `job`; the host validates each result.
+Do not return an arbitrary JSON object for `state`, `action`, or `job`; the host validates each result. The exact frames, payloads, response status enums, ETag requirements, quotas, cancellation semantics and lifecycle are in [WASM runtime v1](wasm-runtime-v1.md).
 
 ### Plugin-owned files
 
-Use the paths supplied by the host; never hard-code `/config/package` because that path exists only outside the private root:
+The module's own package is mounted read-only at `/package` (`DIAN115_PLUGIN_PACKAGE=/package`), so bundled assets can be read with ordinary language I/O. There is no writable mount, no `/data` and no `/tmp`: `DIAN115_PLUGIN_FILESYSTEM` is `broker-storage`, and every persistent value must go through Host Storage.
 
 ```go
-packageDir := os.Getenv("DIAN115_PLUGIN_PACKAGE") // /package/<current-release>
-dataDir := os.Getenv("DIAN115_PLUGIN_DATA")       // /data
-tempDir := os.Getenv("TMPDIR")                   // /tmp
-
-template, err := os.ReadFile(filepath.Join(packageDir, "assets", "template.json"))
+template, err := os.ReadFile("/package/assets/template.json")
 if err != nil { /* report initialization failure */ }
-
-if err := os.MkdirAll(filepath.Join(dataDir, "cache"), 0o700); err != nil { /* handle */ }
-if err := os.WriteFile(filepath.Join(dataDir, "cache", "index.json"), payload, 0o600); err != nil { /* handle */ }
+// Persist state through Host Storage, not a local file.
 ```
 
-The current release under `/package` is host-managed and read-only. `/data` persists across process restarts, container restarts and plugin updates. `/tmp` is private to the plugin but must not be treated as durable state. Absolute paths such as `/config`, `/etc`, `/proc`, media mounts and paths copied from another plugin do not resolve outside the private root. To access an administrator-approved host path, call the corresponding file Host API; do not try to translate it into a local path.
-
-Read `DIAN115_PLUGIN_FILESYSTEM` during initialization. `private-root` is the normal mode. `host-api-only` means the deployment removed the Docker default chroot capability; in that mode all pathname filesystem syscalls are intentionally denied and plugin-owned files must also be stored through Host API storage.
+`/package` is host-managed and read-only, and its contents change with every installed version. Host paths such as `/config`, `/etc`, `/proc` and media mounts never resolve for the module. To access an administrator-approved host path, call the corresponding file Host API; do not try to translate it into a local path.
 
 ## 5. Use Host Call
 
@@ -207,13 +232,13 @@ Result:
 }
 ```
 
-`body_base64` accepts padded or unpadded standard Base64 on requests. Responses use unpadded standard Base64. A process JSON-RPC frame may be up to 16 MiB, and the decoded Host Call request or response body may be up to 8 MiB. Use endpoint pagination even though normal payloads are no longer constrained to 256 KiB.
+`body_base64` accepts padded or unpadded standard Base64 on requests. Responses use unpadded standard Base64. A plugin invocation frame may be up to 16 MiB, and the decoded Host Call request or response body may be up to 8 MiB. Use endpoint pagination even though normal payloads are no longer constrained to 256 KiB.
 
 External access supports only `GET`, `HEAD`, `POST`, `PUT`, `PATCH`, and `DELETE`. `OPTIONS`, `CONNECT`, and `TRACE` are not part of the contract. HTTP/HTTPS transport, DNS, redirects, target resolution and proxy selection are performed by the host. Details and HTTP security warnings are in [Host Call v2](host-call-v2.md).
 
 ### Read host-configured Emby data
 
-The backend process can read Emby without receiving the server URL or API Key. Declare only the operations it uses:
+The plugin runtime can read Emby without receiving the server URL or API Key. Declare only the operations it uses:
 
 ```json
 {
@@ -240,14 +265,14 @@ For episode subscriptions, also declare `GET /api/plugin-host/emby/episodes`. Co
 
 Send an active notification through the approved local API `POST /api/notifications/plugin`. The host uses its Bot configuration and recipient policy; the plugin cannot select an arbitrary chat ID or obtain the Bot Token.
 
-Register incoming routes at runtime, normally while handling `runtime.initialize`:
+Declare incoming routes in the manifest. The host registers them at install and
+enable time, matches a message against them **without loading the plugin**, and
+only then loads the plugin to handle it. That is what lets a Telegram plugin
+stay unloaded while idle:
 
 ```json
 {
-  "jsonrpc": "2.0",
-  "id": "p:telegram:1",
-  "method": "host.telegram.register",
-  "params": {
+  "telegram": {
     "commands": [
       {"command": "media_helper", "description": "Open media helper"}
     ],
@@ -257,6 +282,11 @@ Register incoming routes at runtime, normally while handling `runtime.initialize
   }
 }
 ```
+
+At most 3 commands and 3 keywords per plugin, and command names must not collide
+with each other or with the host's reserved commands. Unloading the plugin no
+longer drops the routes, so a plugin does not need to stay resident to keep
+receiving messages.
 
 Each installation may register at most 3 commands and 3 keywords. Registration atomically replaces the installation's previous set. Reserved host commands, conflicts with another plugin, or the global 64-plugin-command limit return JSON-RPC `-32003`; the previous registration remains active and installation is not affected.
 
@@ -320,7 +350,7 @@ The package root must contain:
 manifest.json
 frontend/icon.svg                 # optional icon, UI itself is mandatory
 frontend/dist/assets/...          # mandatory signed Federation assets
-runtime/plugin.wasm                # recommended WASM reactor (or runtime/plugin for legacy process)
+runtime/plugin.wasm                # mandatory WASM reactor
 integrity.json
 signature.json
 ```
@@ -339,9 +369,9 @@ Publish the `.d115p` on HTTPS and add one entry to a market `index.json`. The ma
 
 ## 10. Local import behavior
 
-An administrator may also select the finished `.d115p` from the Plugin Center. This is an installation path, not a second package format: the host performs the same archive, manifest, integrity, signature, runtime, Federation UI, and permission checks (including static ELF checks for legacy process packages) before presenting the consent dialog. The package must therefore be complete and signed even when it is not published in a market index.
+An administrator may also select the finished `.d115p` from the Plugin Center. This is an installation path, not a second package format: the host performs the same archive, manifest, integrity, signature, WASM runtime, Federation UI, and permission checks before presenting the consent dialog. The package must therefore be complete and signed even when it is not published in a market index.
 
-The inspect endpoint is `POST /api/plugin-center/v1/imports/inspect` with a multipart field named `package`. A successful response contains `import_token`, `expires_at`, `file_name`, and the same plugin permission snapshot shown by a market install. The administrator then submits `POST /api/plugin-center/v1/imports/{token}/install` with `permissions_accepted: true`, the returned `consent_digest`, and `process_risk_accepted: true` for process plugins. The host revalidates every value and queues the normal `plugin_install` operation.
+The inspect endpoint is `POST /api/plugin-center/v1/imports/inspect` with a multipart field named `package`. A successful response contains `import_token`, `expires_at`, `file_name`, and the same plugin permission snapshot shown by a market install. The administrator then submits `POST /api/plugin-center/v1/imports/{token}/install` with `permissions_accepted: true` and the returned `consent_digest`. The host revalidates every value and queues the normal `plugin_install` operation.
 
 Import tokens are private, single-use, and expire after 15 minutes. The host deletes the staged file after the operation is accepted or rejected. No local package is uploaded to a repository, and the installed source is recorded as `本地导入`.
 
@@ -350,8 +380,8 @@ Import tokens are private, single-use, and expire after 15 minutes. The host del
 - UI is present, exposes the declared module, uses host singletons, and contains no unsigned remote scripts.
 - UI bridge props, action inputs and results are JSON-serializable; no functions, DOM nodes, cyclic objects, `BigInt` or Vue proxy objects cross the bridge.
 - Every UI asset and runtime file is covered by `integrity.json`.
-- WASM runtime entry has the WASM magic and reactor exports; legacy process entry is a static ELF for the target architecture and has executable ZIP mode bits.
-- Runtime handles full-duplex JSON-RPC and every required response contract.
+- WASM runtime entry has the WASM magic, exports `dian115_alloc`/`dian115_handle` and exports memory.
+- Runtime returns the required response envelope for every op and handles cancellation.
 - Every local Host API is declared exactly and appears in OpenAPI.
 - Write calls use stable idempotency keys.
 - Network calls use host-brokered HTTP/HTTPS, support local services, and tolerate proxy use and redirect revalidation.
