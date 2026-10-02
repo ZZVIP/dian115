@@ -171,6 +171,36 @@ GET /api/plugin-host/emby/items/:id
 
 宿主使用自己保存的地址和 API Key 发起请求。插件只能获得 OpenAPI 列出的安全字段；地址、API Key、媒体路径、`MediaSources`、用户播放数据、用户身份、会话、设备和日志不会返回，也没有 Emby 写接口。统计接口中的 `user_count` 和 `playing_count` 只是数量。媒体列表一次最多 50 条，应按 `offset + limit` 分页，直到已读取数量达到 `total`。
 
+### 2.4 插件通知与通道能力
+
+`POST /api/notifications/plugin` 只管"发什么"，不选通道：宿主把它投递到当前所有已配置的通道（Telegram、企业微信、微信 ClawBot）。但**三条通道能承载的东西不一样**，所以响应里的 `channels` 会如实报告每条通道会保留和丢弃什么：
+
+```json
+{
+  "event": "plugin_notification",
+  "accepted": true,
+  "channels": [
+    {"channel": "telegram", "preserved": ["link_buttons", "callback_buttons", "images"]},
+    {"channel": "wecom", "preserved": ["link_buttons", "images"], "dropped": ["callback_buttons"]},
+    {"channel": "wechat_claw", "preserved": ["images"], "dropped": ["link_buttons", "callback_buttons"]}
+  ]
+}
+```
+
+当前能力对照：
+
+| 能力 | Telegram | 企业微信 | 微信 ClawBot |
+| --- | --- | --- | --- |
+| `link_buttons`（链接按钮） | ✓ | ✓（只取第一个） | ✗ |
+| `callback_buttons`（回调按钮） | ✓ | ✗ | ✗ |
+| `images`（图片） | ✓ | ✓ | ✓ |
+
+**只要 `callback_buttons` 出现在某条通道的 `dropped` 里，就该认为这条通道上的按钮交互不可用**：企业微信会把第一个链接按钮当作跳转地址，回调按钮没有 URL，因此会被丢弃；ClawBot 完全不接收按钮。插件应当据此降级——例如改用链接按钮，或提示用户回复文字后由插件处理，而不是等待一个永远不会到来的回调。
+
+响应只描述通道会保留什么，不代表消息已经送达；投递失败由宿主的持久化队列重试。`accepted` 为真表示通知已被接受并进入投递流程。
+
+两点补充：ClawBot 不接受远程图片直发，宿主要先下载再作为**单独一条消息**发出，所以带图通知在这条通道上是"先文字、后图片"两条消息；另外，`preserved` 说的是通道**能**承载什么，通道自身的通知设置（例如某条通道关闭了图片）仍可能让图片不发。
+
 ## 3. 外部 HTTP/HTTPS 与本地服务
 
 把完整 URL 放入 `path`：

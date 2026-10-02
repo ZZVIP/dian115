@@ -6646,6 +6646,29 @@ components:
         deduplicated: {type: boolean}
         suppressed: {type: boolean}
         suppression_reason: {type: string}
+        channels:
+          type: array
+          description: 每条已配置通道会保留或丢弃这条通知的哪些能力。能力出现在 `dropped` 里，说明该通道无法承载它——例如企业微信和微信 ClawBot 都无法把回调按钮的点击送回插件，此时插件应当改用链接按钮或提示用户用文字回复，而不是等待一个永远不会到来的回调。
+          items:
+            $ref: '#/components/schemas/ChannelSupport'
+    ChannelSupport:
+      type: object
+      additionalProperties: false
+      required: [channel]
+      properties:
+        channel:
+          type: string
+          enum: [telegram, wecom, wechat_claw]
+        preserved:
+          type: array
+          items:
+            type: string
+            enum: [link_buttons, callback_buttons, images]
+        dropped:
+          type: array
+          items:
+            type: string
+            enum: [link_buttons, callback_buttons, images]
     NotificationEnvelope:
       type: object
       additionalProperties: false

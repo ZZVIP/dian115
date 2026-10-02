@@ -70,6 +70,8 @@ Action 的业务结果 `status` 仅允许 `succeeded`、`failed`、`accepted` �
 
 当前公开的入站交互渠道是 Telegram。`/api/notifications/plugin` 是插件发起的出站通知接口，不会把系统通知伪装成用户入站消息；新增渠道必须先定义独立的脱敏事件投影、身份范围、幂等键和回复校验。
 
+出站通知不受这条限制：宿主会把插件通知投递到**所有已配置的通道**（Telegram、企业微信、微信 ClawBot），但各通道能承载的能力不同。响应里的 `channels` 字段会报告每条通道保留和丢弃了什么——特别是 `callback_buttons`：只有 Telegram 能把按钮点击送回插件，另两条通道会丢弃它。**插件必须检查这个字段再决定交互方式**，不要假设按钮在所有通道都可用，详见 host-call-v2.md 第 2.4 节。
+
 ## 网络地址
 
 manifest 中的 `permissions.network` 是安装时的用途和代理偏好说明，不是永久 allowlist。安装后插件页面可以通过 Host Storage 保存用户输入的 HTTP/HTTPS 地址并调用网络 Broker；未声明地址默认跟随宿主系统代理。Broker 仍执行 URL、重定向、凭据过滤、响应上限和审计，插件不能直接打开 Socket。用户应自行承担其添加的目标服务、凭据和数据风险。
