@@ -65,6 +65,8 @@ Demo 使用静态样例数据展示页面与交互。真实账号连接、后台
 
 ## 部署指南
 
+**优先推荐 Host 网络部署（Linux / NAS）。** DIAN-115 直接使用宿主机网络，Web 管理端、Emby 代理和音乐服务无需逐项配置 Docker 端口映射，适合多实例代理场景。下方完整 Compose 示例默认采用 Host 网络；需要 Docker 网络隔离时，可选择桥接模式。
+
 ### 环境准备
 
 - 使用 Linux / NAS 主机，安装 Docker Engine 与 Docker Compose v2。
@@ -72,7 +74,7 @@ Demo 使用静态样例数据展示页面与交互。真实账号连接、后台
 - 使用 CD2 时，先完成 FUSE、共享挂载、API Token 和云盘挂载设置，参见 [CD2 部署与接入](https://madbrolab.github.io/dian115/#guide/cd2)。
 - 为 DIAN-115 与 Emby 配置一致的媒体目录和云盘目录，参见 [路径搭配指南](https://madbrolab.github.io/dian115/#guide/paths)。
 
-### Docker Compose：Host 网络
+### 推荐部署：Docker Compose · Host 网络
 
 新建部署目录，创建 `config` 和 `dian115AI` 子目录，将下面示例保存为 `compose.yml`。`/mnt/user/media` 与 `/mnt/cache/CloudNAS` 是宿主机示例路径，部署前替换为实际目录。
 
@@ -104,17 +106,17 @@ docker compose ps
 docker compose logs --tail=200 dian115
 ```
 
-访问 `http://服务器IP:8095`，设置管理员密码并完成授权激活。Host 网络下，服务直接使用宿主机端口。
+访问 `http://服务器IP:8095`，设置管理员密码并完成授权激活。`network_mode: host` 下无需添加 `ports`；Emby 代理和音乐服务也直接使用各自在页面中配置的宿主机端口，多个服务或实例应设置不同端口。
 
-### 桥接网络
+### 可选部署：桥接网络
 
-使用桥接网络时，从上方示例中移除 `network_mode: host`，在 `dian115` 服务下添加：
+需要 Docker 网络隔离时，可改用桥接网络。从上方示例中移除 `network_mode: host`，在 `dian115` 服务下添加：
 
 ```yaml
 ports:
   - "8095:8095"
   - "8098:8098" # 第一个 Emby 代理实例，按实际配置调整
-  # - "4534:4534" # 使用 Navidrome 代理时按实际配置启用
+  # - "4534:4534" # 使用独立音乐服务器时按实际配置启用
 ```
 
 多个 Emby 代理实例或其他独立服务端口需要分别映射。使用反向代理时，将目标指向实际的服务地址与端口。
@@ -159,8 +161,8 @@ docker compose up -d flaresolverr
 
 | 部署关系 | 服务地址 |
 | --- | --- |
+| DIAN-115 使用 Host 网络，FlareSolverr 在同一宿主机（推荐搭配） | `http://127.0.0.1:8191`，使用上方端口映射。 |
 | DIAN-115 与 FlareSolverr 在同一 Compose 桥接网络 | `http://flaresolverr:8191`，服务间访问可不映射端口。 |
-| DIAN-115 使用 Host 网络，FlareSolverr 在同一宿主机 | `http://127.0.0.1:8191`，使用上方端口映射。 |
 | 不同机器或不同 Docker 网络 | 映射到实际内网地址后使用 `http://FlareSolverr主机IP:8191`。 |
 
 桥接网络容器中的 `127.0.0.1` 指向容器自身。首次请求可能因浏览器环境启动而较慢；完整步骤见 [FlareSolverr 指南](https://madbrolab.github.io/dian115/#guide/flaresolverr)。
