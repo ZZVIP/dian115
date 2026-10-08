@@ -1,249 +1,228 @@
 <p align="center">
-  <img src="frontend/public/logo.jpg" alt="DIAN-115" width="86" />
+  <img src="frontend/public/logo.jpg" alt="DIAN-115 Logo" width="86" />
 </p>
 
 <h1 align="center">DIAN-115</h1>
 
 <p align="center">
-  <strong>115 网盘媒体自动化与 Emby/Navidrome 运营控制台</strong><br/>
-  从资源发现、订阅、转存、下载、整理、STRM、Emby 入库、播放代理、分享，到旧库迁移和日常维护的一体化工具。
+  <strong>115 网盘媒体自动化与 Emby / Navidrome 管理平台</strong><br />
+  连接资源发现、订阅、转存、整理、入库与播放，让个人收藏和多人影音服务拥有完整的工作流。
 </p>
 
 <p align="center">
-  <a href="https://madbrolab.github.io/dian115/demo/#/overview"><strong>▶ 在线演示</strong></a>
-  ·
-  <a href="https://madbrolab.github.io/dian115/">完整 Wiki</a>
-  ·
-  <a href="https://t.me/dian115group">Telegram 群组</a>
-  ·
-  <a href="docs/plugin-platform/README.md"><code>插件开发</code></a>
+  <a href="https://madbrolab.github.io/dian115/">用户 WIKI</a> ·
+  <a href="https://madbrolab.github.io/dian115/demo/">在线 Demo</a> ·
+  <a href="https://t.me/dian115group">Telegram 交流群</a> ·
+  <a href="docs/plugin-platform/README.md">插件开发文档</a>
 </p>
 
 <p align="center">
-  <a href="https://madbrolab.github.io/dian115/demo/#/overview">
-    <img src="https://img.shields.io/badge/在线演示-立即体验-2563EB?style=for-the-badge&logo=googlechrome&logoColor=white" alt="打开 DIAN-115 在线演示" />
-  </a>
+  <img src="https://img.shields.io/badge/Platform-Linux-333333?logo=linux&logoColor=white" alt="Linux 平台" />
+  <img src="https://img.shields.io/badge/Deployment-Docker-2496ED?logo=docker&logoColor=white" alt="Docker 部署" />
+  <img src="https://img.shields.io/badge/License-Private-64748B" alt="私有授权" />
 </p>
 
-<p align="center">
-  <img src="https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker&logoColor=white" alt="Docker Ready" />
-  <img src="https://img.shields.io/badge/License-Private-red" alt="Private License" />
-  <img src="https://img.shields.io/badge/115-%E5%AA%92%E4%BD%93%E8%87%AA%E5%8A%A8%E5%8C%96-1f7a8c" alt="115 Media Automation" />
-  <img src="https://img.shields.io/badge/Emby-Madby%20%2B%20FFP-6c63ff" alt="Emby Madby FFP" />
-</p>
+## 项目介绍
 
-> DIAN-115 是私有授权项目。普通用户使用发布镜像部署即可，README 不提供源码构建指引。
+DIAN-115 是面向个人、家庭与自托管用户的媒体自动化管理平台。它连接 115 网盘、CloudDrive2 / AURA、Emby、Navidrome、PT 站点、Telegram 和通知服务，将资源获取、媒体整理、STRM 生成、媒体入库、播放代理与日常维护组织成可追踪的工作流。
 
+主程序采用私有授权，通过发布镜像部署。本仓库提供用户文档、规则与第三方插件开发资料；完整使用教程见 [用户 WIKI](https://madbrolab.github.io/dian115/)。
 
+**典型工作流：** 发现资源 → 订阅或获取 → 识别与整理 → 生成 STRM → Emby 入库与播放 → 通知、分享与维护。
 
+## 核心功能
 
-## 插件开发与源码发布边界
+| 功能模块 | 主要能力 |
+| --- | --- |
+| 资源发现与订阅 | 探索电影、剧集与演员；接入 PT 搜索、RSS、Telegram 频道、UIndex、TGx、TheRARBG、海盗湾与癫影，按来源和质量策略订阅。 |
+| 115 账号与文件 | 多账号配置、Cookie 健康检查、离线下载、分享与回收站维护；支持目录书签、批量改名与文件管理。 |
+| 媒体整理 | TMDB 刮削、AI 辅助识别、命名模板、分类规则、洗版和多版本管理；支持本地整理与 CD2 云端整理。 |
+| STRM 与虚拟影库 | 目录树构建，全量、增量和实时同步，STRM 生成、孤立文件清理与播放链接模式配置。 |
+| Emby 接入与迁移 | 多实例播放代理、媒体浏览、缺集检查、媒体分享、Webhook / Madby 事件接入，以及 Emby 媒体画像与 FFP 复用。 |
+| 音乐中心 | Navidrome / Subsonic 接入、音乐目录树、歌曲 ID 同步与软链接生成；提供专辑、歌单、歌词和独立播放器。 |
+| 内置工具 | 文件秒传、多号云迁移、秘享空间、视频下载器、Emby 封面、AI 字幕、统计海报、PT 刷流与站点统计等。 |
+| 通知与 AI | Telegram、企业微信、微信 ClawBot 独立配置通知；点点 AI 助手支持流式对话，按使用位置选择模型和管理工具。 |
+| 用户门户 | 独立用户入口，支持共享或独享账号、求片、工单、消息、签到积分、社区、徽章与观影记录。 |
+| 系统与运维 | 任务队列、运行日志、全局与 FFP 缓存、DianCupLite 容器管理，以及网络、API、词表和安全设置。 |
 
-第三方插件开发只依赖 [`docs/plugin-platform/`](docs/plugin-platform/README.md) 中的公开协议、Schema、OpenAPI、Vue Federation UI 契约、完整示例和黑盒联调工具。
+功能依赖相应的账号、外部服务与授权配置。详细说明见 [功能介绍](https://madbrolab.github.io/dian115/#features) 和 [门户指南](https://madbrolab.github.io/dian115/#guide/portal)。
 
+## 在线体验
 
-## 项目截图
+| 演示入口 | 体验内容 |
+| --- | --- |
+| [管理控制台](https://madbrolab.github.io/dian115/demo/) | 探索、订阅、整理、文件、插件和系统管理。 |
+| [用户门户](https://madbrolab.github.io/dian115/demo/portal/) | 用户账户、媒体、求片、积分、社区和工单。 |
+| [音乐播放器](https://madbrolab.github.io/dian115/demo/music/) | 专辑、歌曲、歌单、收藏、歌词和播放界面。 |
 
-![DIAN-115 功能总览](screenshots/from.png)
+Demo 使用静态样例数据展示页面与交互。真实账号连接、后台任务与媒体服务在自己的部署实例中配置。
 
-<p align="center">
-  <img src="screenshots/overview.png" alt="总览" width="49%" />
-  <img src="screenshots/discovery.png" alt="探索发现" width="49%" />
-</p>
+## 授权激活
 
-<p align="center">
-  <img src="screenshots/media-subscription.png" alt="媒体订阅" width="49%" />
-  <img src="screenshots/organize.png" alt="媒体整理" width="49%" />
-</p>
+首次启动时，按页面提示填写 License Key 完成激活；已激活实例可从账号菜单更换密钥，页面提示需要重启时按提示操作。详细步骤见 [授权与激活指南](https://madbrolab.github.io/dian115/#guide/license)。
 
-<p align="center">
-  <img src="screenshots/virtual-library.png" alt="虚拟影库" width="49%" />
-  <img src="screenshots/media.png" alt="我的媒体" width="49%" />
-</p>
+实际承载量取决于主机、账号与外部服务，授权有效期与附加功能以收到的密钥为准。授权或激活遇到问题时，可联系 [@succt](https://t.me/succt)。
 
-<p align="center">
-  <img src="screenshots/files.png" alt="文件管理" width="49%" />
-  <img src="screenshots/downloads.png" alt="下载管理" width="49%" />
-</p>
+## 部署指南
 
-<p align="center">
-  <img src="screenshots/accounts.png" alt="账号配置" width="49%" />
-  <img src="screenshots/pt-sites.png" alt="站点配置" width="49%" />
-</p>
+### 环境准备
 
-<p align="center">
-  <img src="screenshots/plugins.png" alt="插件中心" width="49%" />
-  <img src="screenshots/task-queue.png" alt="任务队列" width="49%" />
-</p>
+- 使用 Linux / NAS 主机，安装 Docker Engine 与 Docker Compose v2。
+- 准备持久化配置目录、媒体目录和云盘挂载目录。
+- 使用 CD2 时，先完成 FUSE、共享挂载、API Token 和云盘挂载设置，参见 [CD2 部署与接入](https://madbrolab.github.io/dian115/#guide/cd2)。
+- 为 DIAN-115 与 Emby 配置一致的媒体目录和云盘目录，参见 [路径搭配指南](https://madbrolab.github.io/dian115/#guide/paths)。
 
-<p align="center">
-  <img src="screenshots/container-update.png" alt="容器更新" width="49%" />
-  <img src="screenshots/cache-center.png" alt="全局缓存" width="49%" />
-</p>
+### Docker Compose：Host 网络
 
-<p align="center">
-  <img src="screenshots/system-settings.png" alt="系统设置" width="49%" />
-</p>
-
-## DIAN-115 能做什么
-
-DIAN-115 不是单纯的文件管理器，也不是只展示前端界面的面板。它把 115 网盘、CloudDrive2、Emby、Navidrome、PT 站点、Telegram、癫影、Madby、FFP、AI 和通知能力串成完整媒体自动化流程。
-
-核心能力包括：
-
-- 115 多账号管理、Cookie 健康检查、离线下载、分享、回收站维护。
-- CloudDrive2 路径配置、115 挂载路径识别、CD2 到 CD2 云端整理。
-- 探索发现、PT 搜索、RSS、Telegram 频道监控、UIndex、TGx、TheRARBG、海盗湾、癫影资源接入。
-- 电影、电视剧、演员订阅，支持 PT/TG/癫影/聚合策略。
-- 媒体整理、命名模板、分类规则、洗版、多版本、TMDB 刮削、AI 辅助识别。
-- STRM 规则、目录树同步、全量/增量/实时同步、孤立清理、链接模式。
-- Emby 代理、Webhook、Madby 事件接入、缺集检测、媒体分享、用户运营。
-- Navidrome 音乐代理、音乐目录树、Song ID 同步、软链接生成。
-- 插件中心：秒传上传、TG 频道监控、通知、Emby 封面、PT 刷流、癫影、PT 站点统计、Emby 媒体画像、AI 字幕翻译。
-- 系统设置：OpenAPI Key、Webhook、HTTP 代理、FlareSolverr、AI 模型、词表、日志、缓存和安全配置。
-- 用户门户仅作为用户端入口提供注册、登录、求片、续期等能力，不是项目主流程重点。
-
-## 部署方法
-
-### Docker Compose 推荐方式
-
-GitHub Pages Wiki 与 README 都以发布镜像部署为准。新建目录，保存 `docker-compose.yml`：
+新建部署目录，创建 `config` 和 `dian115AI` 子目录，将下面示例保存为 `compose.yml`。`/mnt/user/media` 与 `/mnt/cache/CloudNAS` 是宿主机示例路径，部署前替换为实际目录。
 
 ```yaml
 services:
   dian115:
-    image: madbrolab/dian115
+    image: madbrolab/dian115:latest
     container_name: dian115
     restart: unless-stopped
     network_mode: host
+    environment:
+      - PORT=8095
+      - TZ=Asia/Shanghai
     volumes:
-      - ~/config:/config #配置文件目录
-      - ~/dian115AI:/dian115AI  #使用AI工具必填 持久化存放AI产生的长期记忆文件等
-      - /var/run/docker.sock:/var/run/docker.sock #如需自动更新或镜像管理相关功能 请加入此项
-      - ~/media:/media  #本地媒体目录 根据自己实际情况改写  务必跟EMBY保持匹配
-      - ~/CloudNAS:/CloudNAS:shared  #CD2挂载目录 根据自己实际情况改写  务必跟EMBY，CD2保持匹配
+      - ./config:/config
+      - ./dian115AI:/dian115AI
+      - /mnt/user/media:/媒体库
+      - /mnt/cache/CloudNAS:/CloudNAS:rslave
+      # 需要 DianCupLite 容器管理时，按部署方案配置 Docker 访问。
+      # - /var/run/docker.sock:/var/run/docker.sock
 ```
 
-启动：
+启动并查看状态：
 
 ```bash
+docker compose pull
 docker compose up -d
+docker compose ps
+docker compose logs --tail=200 dian115
 ```
 
-访问：
+访问 `http://服务器IP:8095`，设置管理员密码并完成授权激活。Host 网络下，服务直接使用宿主机端口。
 
-```text
-http://<服务器IP>:8095
+### 桥接网络
+
+使用桥接网络时，从上方示例中移除 `network_mode: host`，在 `dian115` 服务下添加：
+
+```yaml
+ports:
+  - "8095:8095"
+  - "8098:8098" # 第一个 Emby 代理实例，按实际配置调整
+  # - "4534:4534" # 使用 Navidrome 代理时按实际配置启用
 ```
 
-首次进入需要设置管理员密码；如果授权守卫提示激活，按页面提示填写 License Key。
-
-### 桥接网络或反向代理场景
-
-如果 Docker 环境不适合使用 `host` 网络，或者需要反向代理统一入口，可以改用端口映射
-
-
-```
+多个 Emby 代理实例或其他独立服务端口需要分别映射。使用反向代理时，将目标指向实际的服务地址与端口。
 
 ### 端口与目录
 
-| 项目 | 默认值 | 用途 |
+| 项目 | 默认值或示例 | 说明 |
 | --- | --- | --- |
-| 主服务端口 | `8095` | Web 管理后台、API、插件入口 |
-| Emby 代理端口 | `8098` | Emby 反向代理、播放重定向，页面中可自定义 |
-| Navidrome 代理端口 | `4534` | 音乐库代理，不用可不暴露 |
-| 调试端口 | `6060` | pprof / 调试，仅排障时内网开放 |
-| 数据目录 | `/config` | 数据库、配置、缓存，必须持久化 |
-| 媒体目录 | `/media` | Emby 可见媒体或 STRM 输出目录 |
-| CD2 挂载目录 | `/CloudNAS` | CloudDrive2 115 挂载根目录 |
+| Web 管理端 | `8095` | 管理后台、API 与插件入口；可通过 `PORT` 调整。 |
+| Emby 代理 | `8098` | 第一个实例的默认端口，其他实例按页面配置。 |
+| Navidrome 代理 | `4534` | 按音乐服务配置启用。 |
+| 应用数据 | `/config` | 数据库、账号与设置，必须持久化并备份。 |
+| AI 工作区 | `/dian115AI` | 使用 AI 文件与仓库工具时持久化。 |
+| 媒体目录 | `/媒体库` | 本示例的媒体和 STRM 输出目录，需与 Emby 保持一致。 |
+| 云盘挂载根 | `/CloudNAS` | CD2 向 DIAN-115 与 Emby 提供的共享目录。 |
 
-## FlareSolverr 部署
+CD2 使用 `/mnt/cache/CloudNAS:/CloudNAS:shared` 发布挂载，DIAN-115 与 Emby 使用 `/mnt/cache/CloudNAS:/CloudNAS:rslave` 接收挂载。宿主机也需支持相应的挂载传播。保存 CD2 API 设置后点击“自动读取”，确认挂载路径，例如 `/CloudNAS/CloudDrive`。
 
-UIndex 等资源站可能触发 Cloudflare 验证。需要这类站点时，单独部署 FlareSolverr，然后在 DIAN-115 系统设置里填写服务地址并测试。
+### FlareSolverr：按需接入
+
+使用 UIndex 等需要 Cloudflare 验证的来源时，可在同一份 Compose 中增加以下服务：
 
 ```yaml
 services:
+  # 保留原有 dian115 服务，在 services 下追加此服务。
   flaresolverr:
     image: ghcr.io/flaresolverr/flaresolverr:latest
     container_name: flaresolverr
     restart: unless-stopped
     ports:
-      - "8191:8191"
+      - "127.0.0.1:8191:8191" # 供同机 Host 网络访问
     environment:
       - LOG_LEVEL=info
-      - LOG_FILE=none
-      - LOG_HTML=false
-      - CAPTCHA_SOLVER=none
       - TZ=Asia/Shanghai
-    volumes:
-      - ./flaresolverr:/config
 ```
 
-服务地址填写参考：
+```bash
+docker compose up -d flaresolverr
+```
 
-| 部署关系 | DIAN-115 中填写 |
+在 **系统设置 → FlareSolverr 过盾设置** 中保存地址并测试连接：
+
+| 部署关系 | 服务地址 |
 | --- | --- |
-| 同一个 Compose 桥接网络 | `http://flaresolverr:8191` |
-| DIAN-115 使用 host 网络，FlareSolverr 在同一宿主机 | `http://127.0.0.1:8191` 或 `http://服务器IP:8191` |
-| 分别部署在不同机器 | `http://FlareSolverr机器IP:8191` |
+| DIAN-115 与 FlareSolverr 在同一 Compose 桥接网络 | `http://flaresolverr:8191`，服务间访问可不映射端口。 |
+| DIAN-115 使用 Host 网络，FlareSolverr 在同一宿主机 | `http://127.0.0.1:8191`，使用上方端口映射。 |
+| 不同机器或不同 Docker 网络 | 映射到实际内网地址后使用 `http://FlareSolverr主机IP:8191`。 |
 
-`8191` 端口建议只在内网访问，不要直接暴露到公网。首次请求可能较慢，这是浏览器环境启动导致的正常现象。
-
-## 旧 Emby 库迁移重点
-
-如果你已经用其它工具生成过 Emby 媒体库，请先处理旧库迁移，再做大规模 STRM 生成。
-
-Emby 媒体画像是旧库迁移的关键插件，不是普通辅助工具。推荐流程：
-
-1. 先完成最小基础配置：管理员、授权、115 账号、CD2 地址/API Token、CD2 挂载路径。
-2. 在 STRM 规则中先构建目录树，不要立刻生成 STRM。
-3. 打开 Emby 媒体画像插件，连接旧 Emby 地址和 API Key，拉取旧库媒体条目、文件路径和媒体画像。
-4. 配置路径替换，把旧 Emby 路径映射到 DIAN-115 新的 115/CD2 目录树。
-5. 配置 Madby 插件，填写 DIAN-115 地址和 OpenAPI Key，避免原生 Webhook 与 Madby 重复通知。
-6. 将可用画像上报到癫影 SHA1 FFP，保留旧库识别成果。
-7. 确认路径匹配、Madby、FFP 和通知链路都正常后，再生成新 STRM，并让新的或干净的 Emby 媒体库扫描。
-
-最容易出错的是还没完成旧路径匹配，就同时打开新 STRM 生成和 Emby 大规模扫描。这样会让旧库画像、新 STRM、新 Emby 条目混在一起，后面很难排障。
+桥接网络容器中的 `127.0.0.1` 指向容器自身。首次请求可能因浏览器环境启动而较慢；完整步骤见 [FlareSolverr 指南](https://madbrolab.github.io/dian115/#guide/flaresolverr)。
 
 ## 推荐配置顺序
 
-普通新装场景建议按这个顺序走：
+1. **初始化与激活**：设置管理员密码和 License Key，确认重启后数据与授权状态保留。
+2. **云盘与路径**：添加 115 主账号，配置 CD2 / AURA 地址、Token、挂载点及实际云盘名称，验证目录可读。
+3. **迁移评估**：已有 Emby 媒体库时，先按下方流程保留媒体画像与路径映射。
+4. **媒体服务**：接入 Emby / Navidrome，配置代理端口、路径转换、Webhook / Madby 和 OpenAPI Key。
+5. **资源来源**：验证下载器、PT 站点、RSS、Telegram 频道监控与癫影的连接。
+6. **整理与 STRM**：用小目录测试识别、命名、分类和洗版，先全量建树，再生成 STRM，验证播放后开启实时或定时同步。
+7. **通知与扩展**：配置各通知渠道、AI、音乐与用户门户，验证消息、播放和访问权限。
+8. **日常运维**：设置备份与维护计划，通过任务队列、日志、缓存和账号状态持续检查。
 
-1. 部署服务，访问 `http://服务器IP:8095`，设置管理员密码。
-2. 完成购买与授权激活，确认重启后授权状态仍然存在。
-3. 配置 115 账号，保存安全码、分享目录、离线目录，检查 Cookie 健康。
-4. 配置 CloudDrive2 地址、API Token、115 挂载路径。
-5. 如果迁移旧 Emby 库，先完成 Emby 媒体画像、Madby 和 FFP 流程。
-6. 配置 Emby / Navidrome 代理、Webhook、OpenAPI Key。
-7. 配置 PT 站点、下载器、RSS、Telegram 通知和 TG 频道监控。
-8. 按小范围目录测试媒体整理规则、命名模板、分类和洗版策略。
-9. 创建 STRM 规则，先全量建树，再生成 STRM，最后开启实时或定时同步。
-10. 配置通知、日志保留、缓存维护和备份计划。
+接收、整理、STRM 输出与播放分别验证。完整教程见 [配置指南](https://madbrolab.github.io/dian115/#setup)。
 
-## 完整使用闭环
+## 已有 Emby 媒体库迁移
 
-典型使用路径：
+已有媒体库由其他工具生成时，先处理媒体画像与旧路径，确认后再生成新 STRM。推荐流程：
 
-1. 在探索发现、PT 搜索、TG 频道、UIndex、TGx、TheRARBG、海盗湾或癫影中找到资源。
-2. 直接转存 115 分享、提交离线下载，或加入电影/电视剧/演员订阅。
-3. 下载或转存完成后进入媒体整理规则，识别片名、季集、年份、质量和版本。
-4. 按分类和命名模板移动到目标目录，必要时触发洗版、多版本保留或覆盖策略。
-5. STRM 规则构建目录树并生成 Emby 可扫描的 STRM 文件。
-6. Emby 扫描后，通过 Webhook / Madby / 通知插件进入入库、分享、缺集、播放和统计流程。
-7. 日常通过任务队列、运行日志、缓存管理和账号健康检查维护系统。
+1. 备份旧 Emby 数据库、STRM 目录与 DIAN-115 配置，完成账号、CD2 与授权连接。
+2. 在 STRM 规则中只构建目录树，暂不生成 STRM。
+3. 通过 **插件中心 → Emby 媒体画像** 读取旧库条目、路径、媒体流与章节信息。
+4. 配置路径替换，将旧 Emby 路径匹配到新的 115 / CD2 目录树，检查未匹配条目。
+5. 配置 Madby 的 DIAN-115 地址与 OpenAPI Key，核对原生 Webhook 与 Madby 的事件配置，避免重复通知。
+6. 将可用画像上报到癫影 SHA1 FFP，保留可复用的识别结果。
+7. 确认路径、画像、Madby 与通知正常后，再生成 STRM 并进行 Emby 扫描。
 
-## 常见维护建议
+路径尚未匹配时，同时生成 STRM 与执行大规模扫描会增加重复条目和排查成本。迁移应先完成小范围验证，再逐步切换媒体库。
 
-- 备份优先级：`/config` 目录最高，其次是 STRM 输出目录、路径替换规则、关键插件配置。
-- 更新镜像前先备份 `/config`，再执行 `docker compose pull` 和 `docker compose up -d`。
-- 115 Cookie、PT Cookie、Telegram Bot Token、OpenAPI Key 不要混用，不要公开。
-- FlareSolverr、HTTP 代理、Telegram、TMDB、115 连通性问题优先看系统设置里的网络测试和运行日志。
-- 整理规则大改前先用小目录测试，不要直接对大库开启监控。
-- 迁移旧库时，先备份旧 Emby 数据库、旧 STRM 输出目录和 DIAN-115 数据库。
+## 更新与维护
+
+- 优先备份完整 `/config`，同时保存 STRM 输出、路径规则和关键插件配置；使用 AI 工作区时一并备份。
+- 更新前结束重要任务并完成备份，再执行以下命令，更新后核对账号、连接与最近日志。
+
+```bash
+docker compose pull dian115
+docker compose up -d dian115
+docker compose logs --tail=200 dian115
+```
+
+- 网络或连接异常时，先检查系统设置中的连接测试，再结合任务详情与运行日志定位问题。
+- 整理规则或挂载路径变化后，先在小目录验证读取、识别、输出与播放。
+- Cookie、Bot Token、OpenAPI Key、完整授权码等敏感信息应妥善保管；反馈问题时对相关日志脱敏。
+
+## 插件开发与规则贡献
+
+第三方插件开发以 [插件平台公开文档](docs/plugin-platform/README.md) 为准，包含协议、Schema、OpenAPI、Vue Federation UI 契约、完整示例和黑盒联调工具。插件开发使用公开契约，主程序源码保持私有。
+
+内置工具随主程序运行，第三方插件通过插件平台安装与管理。规则贡献请阅读 [贡献指南](CONTRIBUTING.md)；在线规则入口见 [online-rules](online-rules/README.md)。
+
+## 文档与支持
+
+- [用户 WIKI](https://madbrolab.github.io/dian115/)：功能、部署、配置、授权与门户教程。
+- [Telegram 交流群](https://t.me/dian115group)：使用交流与问题反馈。
+- [官方支持 @succt](https://t.me/succt)：授权与激活问题。
+
+反馈问题时，请提供版本、部署方式、复现步骤和脱敏后的相关日志。
 
 ## 致谢
 
-- [CloudDrive2](https://www.clouddrive2.com/)
-- [Emby](https://emby.media/)
-- [Navidrome](https://www.navidrome.org/)
-- [TMDB](https://www.themoviedb.org/)
+感谢以下项目与服务为媒体管理工作流提供支持：
+
+[CloudDrive2](https://www.clouddrive2.com/) · [Emby](https://emby.media/) · [Navidrome](https://www.navidrome.org/) · [TMDB](https://www.themoviedb.org/)
